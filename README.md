@@ -1,4 +1,4 @@
-<!-- Copyright 2026 Synthicsoft Labs LLC; Licensed under Apache-2.0. -->
+<!-- Copyright 2026 Adam Joseph Rivers, CEO, Synthicsoft Labs LLC. Licensed under Apache-2.0. -->
 
 <div align="center">
 
@@ -8,6 +8,8 @@
 
 **Persistent. Distributed. Self-configuring. GitHub-native.**
 
+**Created by Adam Joseph Rivers · CEO, Synthicsoft Labs LLC**
+
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-111827?style=for-the-badge&logo=apache)](LICENSE)
 [![Rust](https://img.shields.io/badge/Rust-2024-111827?style=for-the-badge&logo=rust)](https://www.rust-lang.org/)
 [![Repository](https://img.shields.io/badge/GitHub-SynthicsoftLabs%2FNessy-111827?style=for-the-badge&logo=github)](https://github.com/SynthicsoftLabs/Nessy)
@@ -15,6 +17,10 @@
 **Nessy is the engineering foundation of BowserAI:** an autonomous intelligence fabric coordinating runtimes, inference, execution, identity, durable state, MCP tools, and distributed infrastructure through one coherent system.
 
 </div>
+
+---
+
+> **Attribution:** BowserAI / Nessy was created by **Adam Joseph Rivers, CEO of Synthicsoft Labs LLC**. Redistribution is governed by the Apache License, Version 2.0 and its applicable copyright, attribution, NOTICE, and trademark provisions. See [`NOTICE`](NOTICE) and [`LICENSE`](LICENSE).
 
 ---
 
@@ -134,7 +140,8 @@ Autonomous bootstrap is provided by `scripts/bootstrap.sh`.
 ├── ARCHITECTURE.md       system architecture
 ├── AUTOMATION.md         autonomous engineering contract
 ├── SECURITY.md           security architecture
-└── Cargo.toml             workspace definition
+├── NOTICE                creator attribution and legal notice
+└── LICENSE               Apache License 2.0
 ```
 
 ## 📚 Documentation
@@ -144,12 +151,15 @@ Autonomous bootstrap is provided by `scripts/bootstrap.sh`.
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | System topology and subsystem boundaries |
 | [`AUTOMATION.md`](AUTOMATION.md) | Autonomous build and repository automation |
 | [`SECURITY.md`](SECURITY.md) | Security architecture and controls |
+| [`NOTICE`](NOTICE) | Creator attribution and legal notice |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Engineering workflow |
 | [`LICENSE`](LICENSE) | Apache License 2.0 |
 
 <div align="center">
 
 ### 🐢 BOWSERAI / NESSY
+
+**Created by Adam Joseph Rivers · Synthicsoft Labs LLC**
 
 **One fabric. Many runtimes. Persistent state. Autonomous operation.**
 
