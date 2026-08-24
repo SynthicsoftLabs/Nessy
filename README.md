@@ -6,7 +6,7 @@
 
 ### NESSY · AUTONOMOUS INTELLIGENCE FABRIC
 
-**Persistent. Distributed. Self-configuring. GitHub-native.**
+**Persistent · Distributed · Self-configuring · GitHub-native · Frontier-capable**
 
 **Created by Adam Joseph Rivers · CEO, Synthicsoft Labs LLC**
 
@@ -14,7 +14,7 @@
 [![Rust](https://img.shields.io/badge/Rust-2024-111827?style=for-the-badge&logo=rust)](https://www.rust-lang.org/)
 [![Repository](https://img.shields.io/badge/GitHub-SynthicsoftLabs%2FNessy-111827?style=for-the-badge&logo=github)](https://github.com/SynthicsoftLabs/Nessy)
 
-**Nessy is the engineering foundation of BowserAI:** an autonomous intelligence fabric coordinating runtimes, inference, execution, identity, durable state, MCP tools, and distributed infrastructure through one coherent system.
+**Nessy is the engineering foundation of BowserAI:** an autonomous intelligence fabric coordinating AGI capabilities, frontier model providers, runtimes, inference, execution, identity, durable state, MCP tools, research, learning, and distributed infrastructure through one coherent system.
 
 </div>
 
@@ -24,89 +24,120 @@
 
 ---
 
-## ◈ The System
+## ◈ System Fabric
 
 ```text
-                         ┌──────────────────────────────┐
-                         │           BOWSERAI           │
-                         │     AUTONOMOUS FABRIC        │
-                         └──────────────┬───────────────┘
-                                        │
-                    ┌───────────────────┼───────────────────┐
-                    ▼                   ▼                   ▼
-              ┌──────────┐       ┌────────────┐       ┌───────────┐
-              │  TURTLE  │◄─────►│ CAPABILITY │◄─────►│  KAIROS   │
-              │  ENGINE  │       │   ROUTER   │       │ ALWAYS-ON │
-              └────┬─────┘       └─────┬──────┘       └─────┬─────┘
-                   │                   │                    │
-             ┌─────┴─────┐      ┌─────┴─────┐        ┌─────┴─────┐
-             ▼           ▼      ▼           ▼        ▼           ▼
-          ┌──────┐   ┌──────┐ ┌──────┐   ┌──────┐ ┌──────┐   ┌──────┐
-          │ Koopa│   │ MCP  │ │ Local│   │ Cloud│ │ P2P  │   │Remote│
-          │Sandbox│  │Tools │ │Models│   │Models│ │Nodes │   │Agents │
-          └───┬──┘   └──────┘ └───┬──┘   └──┬───┘ └───┬──┘   └──┬───┘
-              │                    │          │         │          │
-              └────────────────────┴──────────┴─────────┴──────────┘
-                                       │
-                              ┌────────▼────────┐
-                              │ DURABLE STATE + │
-                              │ CONTENT ADDRESS │
-                              └────────┬────────┘
-                                       │
-                           ┌───────────┼───────────┐
-                           ▼           ▼           ▼
-                        GitHub       CAS       Persistent DB
+                              ┌─────────────────────────┐
+                              │        BOWSERAI         │
+                              │   AUTONOMOUS INTELLIGENCE│
+                              │          FABRIC          │
+                              └────────────┬────────────┘
+                                           │
+                              ┌────────────▼────────────┐
+                              │   AGI CAPABILITY GRAPH  │
+                              │ reason · plan · remember│
+                              │ learn · research · act  │
+                              └────────────┬────────────┘
+                                           │
+              ┌────────────────────────────┼────────────────────────────┐
+              ▼                            ▼                            ▼
+        ┌────────────┐              ┌────────────┐              ┌────────────┐
+        │   KAIROS   │              │   TURTLE   │              │ INFERENCE  │
+        │  ALWAYS-ON │              │ORCHESTRATOR│              │ PROVIDERS  │
+        └─────┬──────┘              └──────┬─────┘              └─────┬──────┘
+              │                            │                            │
+              └────────────────────────────┼────────────────────────────┘
+                                           ▼
+        ┌────────────┬────────────┬────────────┬────────────┬────────────┐
+        │   KOOPA    │    MCP     │  STORAGE   │  IDENTITY  │   GITHUB   │
+        │  EXECUTE   │   TOOLS    │ DURABLE CAS│  AGENTS    │  BACKEND   │
+        └────────────┴────────────┴────────────┴────────────┴────────────┘
+                                           │
+                                           ▼
+                               OBSERVE → EVALUATE → LEARN
+                                           │
+                                           └──────► DISCOVER
 ```
+
+## 🧠 AGI Capability Fabric
+
+Nessy now models AGI capabilities as executable, composable runtime contracts rather than a static model list. The capability graph spans:
+
+| Domain | Fabric |
+|:--|:--|
+| **Reasoning** | structured reasoning, verification, reflection, hypotheses, theorem proving |
+| **Planning** | decomposition, hierarchy, long-horizon plans, replanning, scheduling |
+| **Memory** | working, episodic, semantic, procedural, persistent memory, retrieval, consolidation |
+| **Learning** | online adaptation, preference learning, self-evaluation, skill acquisition, continual improvement |
+| **Agents** | tools, delegation, parallel agents, councils, specialization, asynchronous tasks |
+| **Computer use** | browser, GUI, terminal, filesystem, IDE, remote desktop |
+| **Coding** | generation, repository understanding, refactoring, debugging, testing, benchmarking, worktrees |
+| **Research** | search, fetch, synthesis, literature analysis, experiments, evidence aggregation |
+| **Multimodal** | vision, OCR, audio, speech, video, cross-modal reasoning |
+| **Generation** | text, code, image, video, audio, document generation/editing |
+| **Scientific** | symbolic math, numerical computation, simulation, data analysis, discovery |
+| **Security** | code audit, dependency analysis, threat modeling, secret detection, telemetry |
+| **Infrastructure** | scheduling, peer discovery, failover, checkpointing, replication, workload migration |
+| **Governance** | provenance, attribution, licensing metadata, audit trails, reproducible artifacts |
+
+See [`docs/AGI_CAPABILITY_MATRIX.md`](docs/AGI_CAPABILITY_MATRIX.md) and `crates/capability/src/agi.rs`.
+
+## 🌐 Frontier Model Fabric
+
+Nessy normalizes frontier capabilities across providers into the same capability graph. Current research coverage includes:
+
+**Fable · Glasswing · Qwen · Gemini · Grok · Seed · Seedance · Perplexity · Z.ai / GLM · Gemma**
+
+The provider layer is extensible so additional models and systems become capability providers without redesigning the orchestration layer.
+
+```text
+FRONTIER RESEARCH
+       ↓
+CAPABILITY EXTRACTION
+       ↓
+NORMALIZED CONTRACT
+       ↓
+PROVIDER REGISTRY
+       ↓
+CAPABILITY GRAPH
+       ↓
+TASK DECOMPOSITION
+       ↓
+PARALLEL EXECUTION
+       ↓
+OBSERVE / EVALUATE
+       ↓
+MEMORY / SKILL REGISTRATION
+       ↓
+CONTINUOUS DISCOVERY
+```
+
+## ⚡ Autonomous Runtime
+
+```text
+DISCOVER → REGISTER → MATCH → COMPOSE → ROUTE → EXECUTE
+    ▲                                           │
+    │                                           ▼
+    └──── RECOVER ← CHECKPOINT ← EVALUATE ← OBSERVE
+```
+
+GitHub is the public project/control substrate. Kairos provides always-on runtime integration. Turtle coordinates execution. Koopa supplies execution backends. MCP exposes tools. Storage preserves durable state. Identity establishes agent identity. Inference connects model providers.
 
 ## ◇ Core Fabric
 
 | Layer | Role | Crate |
 |:--|:--|:--|
-| **Bowser Core** | Shared domain model and contracts | `bowser-core` |
-| **Turtle** | Scheduling and task lifecycle | `turtle` |
-| **Koopa** | Execution and sandbox boundary | `koopa` |
-| **Kairos** | Always-on autonomous runtime | `kairos` |
-| **Capability** | Runtime discovery and selection | `capability` |
-| **Inference** | Provider abstraction and routing | `inference` |
+| **Bowser Core** | Shared domain contracts | `bowser-core` |
+| **Turtle** | Scheduling, state, recovery | `turtle` |
+| **Koopa** | Execution backends | `koopa` |
+| **Kairos** | Always-on runtime | `kairos` |
+| **Capability** | Runtime + AGI capability graph | `capability` |
+| **Inference** | Provider routing | `inference` |
 | **Storage** | Durable content-addressed state | `storage` |
 | **Identity** | Autonomous agent identity | `identity` |
-| **MCP** | Tool protocol and validation | `mcp` |
-| **Bowserd** | Persistent autonomous daemon | `bowserd` |
-
-## ⚡ Autonomous by Design
-
-```text
-        DISCOVER
-           │
-           ▼
-       REGISTER ────────┐
-           │            │
-           ▼            │
-        ROUTE ◄─────────┤
-           │            │
-           ▼            │
-        EXECUTE         │
-           │            │
-           ▼            │
-       CHECKPOINT       │
-           │            │
-           ▼            │
-        RECOVER ────────┘
-           │
-           ▼
-       CONTINUE
-```
-
-GitHub is the public project/control substrate; Kairos is an always-on autonomous runtime; inference and execution providers are extensible through the capability fabric.
-
-## ✦ Visual Language
-
-- **🐢 Turtle / Nessy** — persistence, movement, resilience.
-- **BowserAI** — the orchestration identity.
-- **Monospace diagrams** — systems-first communication.
-- **High-contrast documentation** — fast scanning and precise navigation.
-- **Apache-2.0** — one clear project license.
-- **GitHub-native artifacts** — source, automation, releases, and project state in one public substrate.
+| **MCP** | Tool protocol | `mcp` |
+| **GitHub Backend** | GitHub-backed project/control state | `github-backend` |
+| **Bowserd** | Persistent daemon | `bowserd` |
 
 ## 🚀 Build
 
@@ -126,21 +157,24 @@ Autonomous bootstrap is provided by `scripts/bootstrap.sh`.
 ├── crates/
 │   ├── bowser-core/      domain contracts
 │   ├── turtle/           orchestration
-│   ├── koopa/            sandbox/execution
+│   ├── koopa/            execution
 │   ├── kairos/           always-on runtime
-│   ├── capability/       capability fabric
-│   ├── inference/        model/provider routing
+│   ├── capability/       AGI + capability fabric
+│   ├── inference/        provider routing
 │   ├── storage/          durable CAS
-│   ├── identity/         autonomous identity
+│   ├── identity/         agent identity
 │   ├── mcp/              MCP protocol
+│   ├── github-backend/   GitHub backend
 │   └── bowserd/          daemon
-├── docs/                 architecture and engineering docs
-├── scripts/              autonomous bootstrap/tooling
-├── .github/              CI and repository automation
-├── ARCHITECTURE.md       system architecture
+├── docs/
+│   ├── AGI_CAPABILITY_MATRIX.md
+│   └── ...
+├── scripts/              autonomous tooling
+├── .github/              repository automation
+├── ARCHITECTURE.md       system topology
 ├── AUTOMATION.md         autonomous engineering contract
 ├── SECURITY.md           security architecture
-├── NOTICE                creator attribution and legal notice
+├── NOTICE                creator attribution
 └── LICENSE               Apache License 2.0
 ```
 
@@ -148,9 +182,10 @@ Autonomous bootstrap is provided by `scripts/bootstrap.sh`.
 
 | Document | Purpose |
 |:--|:--|
-| [`ARCHITECTURE.md`](ARCHITECTURE.md) | System topology and subsystem boundaries |
-| [`AUTOMATION.md`](AUTOMATION.md) | Autonomous build and repository automation |
-| [`SECURITY.md`](SECURITY.md) | Security architecture and controls |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Full system topology and runtime fabric |
+| [`docs/AGI_CAPABILITY_MATRIX.md`](docs/AGI_CAPABILITY_MATRIX.md) | AGI domains and frontier-provider capability map |
+| [`AUTOMATION.md`](AUTOMATION.md) | Autonomous engineering and repository automation |
+| [`SECURITY.md`](SECURITY.md) | Security architecture |
 | [`NOTICE`](NOTICE) | Creator attribution and legal notice |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Engineering workflow |
 | [`LICENSE`](LICENSE) | Apache License 2.0 |
@@ -159,10 +194,10 @@ Autonomous bootstrap is provided by `scripts/bootstrap.sh`.
 
 ### 🐢 BOWSERAI / NESSY
 
-**Created by Adam Joseph Rivers · Synthicsoft Labs LLC**
+**Created by Adam Joseph Rivers · CEO, Synthicsoft Labs LLC**
 
-**One fabric. Many runtimes. Persistent state. Autonomous operation.**
+**AGI capability fabric · Frontier model fabric · Autonomous runtime**
 
-[GitHub](https://github.com/SynthicsoftLabs/Nessy) · [Architecture](ARCHITECTURE.md) · [Security](SECURITY.md)
+[GitHub](https://github.com/SynthicsoftLabs/Nessy) · [Architecture](ARCHITECTURE.md) · [AGI Matrix](docs/AGI_CAPABILITY_MATRIX.md) · [Security](SECURITY.md)
 
 </div>
