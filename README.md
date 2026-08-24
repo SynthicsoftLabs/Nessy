@@ -1,48 +1,158 @@
-<!--
-Copyright 2026 Synthicsoft Labs LLC
-Licensed under the Apache License, Version 2.0.
-See LICENSE for the Apache License text and project notices.
--->
-# 🐢 BowserAI / Nessy
+<!-- Copyright 2026 Synthicsoft Labs LLC; Licensed under Apache-2.0. -->
 
-Nessy is the repository foundation for BowserAI: a local-first, distributed AI execution platform built around a Rust orchestration core, explicit protocol boundaries, pluggable execution backends, and auditable state.
+<div align="center">
 
-## Architecture
+# 🐢 BOWSERAI
 
-The implementation is organized as a Cargo workspace so protocol, orchestration, sandbox, identity, storage, routing, and shared domain types can evolve independently while retaining a single reproducible build surface.
+### NESSY · AUTONOMOUS INTELLIGENCE FABRIC
+
+**Persistent. Distributed. Self-configuring. GitHub-native.**
+
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-111827?style=for-the-badge&logo=apache)](LICENSE)
+[![Rust](https://img.shields.io/badge/Rust-2024-111827?style=for-the-badge&logo=rust)](https://www.rust-lang.org/)
+[![Repository](https://img.shields.io/badge/GitHub-SynthicsoftLabs%2FNessy-111827?style=for-the-badge&logo=github)](https://github.com/SynthicsoftLabs/Nessy)
+
+**Nessy is the engineering foundation of BowserAI:** an autonomous intelligence fabric coordinating runtimes, inference, execution, identity, durable state, MCP tools, and distributed infrastructure through one coherent system.
+
+</div>
+
+---
+
+## ◈ The System
 
 ```text
-Nessy/
-├── crates/
-│   ├── bowser-core/       # shared domain types and errors
-│   ├── turtle/            # orchestration/session state
-│   ├── koopa/             # execution/sandbox abstractions
-│   └── bowserd/            # executable daemon
-├── docs/
-├── .github/workflows/
-└── Cargo.toml
+                         ┌──────────────────────────────┐
+                         │           BOWSERAI           │
+                         │     AUTONOMOUS FABRIC        │
+                         └──────────────┬───────────────┘
+                                        │
+                    ┌───────────────────┼───────────────────┐
+                    ▼                   ▼                   ▼
+              ┌──────────┐       ┌────────────┐       ┌───────────┐
+              │  TURTLE  │◄─────►│ CAPABILITY │◄─────►│  KAIROS   │
+              │  ENGINE  │       │   ROUTER   │       │ ALWAYS-ON │
+              └────┬─────┘       └─────┬──────┘       └─────┬─────┘
+                   │                   │                    │
+             ┌─────┴─────┐      ┌─────┴─────┐        ┌─────┴─────┐
+             ▼           ▼      ▼           ▼        ▼           ▼
+          ┌──────┐   ┌──────┐ ┌──────┐   ┌──────┐ ┌──────┐   ┌──────┐
+          │ Koopa│   │ MCP  │ │ Local│   │ Cloud│ │ P2P  │   │Remote│
+          │Sandbox│  │Tools │ │Models│   │Models│ │Nodes │   │Agents │
+          └───┬──┘   └──────┘ └───┬──┘   └──┬───┘ └───┬──┘   └──┬───┘
+              │                    │          │         │          │
+              └────────────────────┴──────────┴─────────┴──────────┘
+                                       │
+                              ┌────────▼────────┐
+                              │ DURABLE STATE + │
+                              │ CONTENT ADDRESS │
+                              └────────┬────────┘
+                                       │
+                           ┌───────────┼───────────┐
+                           ▼           ▼           ▼
+                        GitHub       CAS       Persistent DB
 ```
 
-## Development
+## ◇ Core Fabric
 
-Requirements: Rust stable and `just` (or invoke the equivalent Cargo commands directly).
+| Layer | Role | Crate |
+|:--|:--|:--|
+| **Bowser Core** | Shared domain model and contracts | `bowser-core` |
+| **Turtle** | Scheduling and task lifecycle | `turtle` |
+| **Koopa** | Execution and sandbox boundary | `koopa` |
+| **Kairos** | Always-on autonomous runtime | `kairos` |
+| **Capability** | Runtime discovery and selection | `capability` |
+| **Inference** | Provider abstraction and routing | `inference` |
+| **Storage** | Durable content-addressed state | `storage` |
+| **Identity** | Autonomous agent identity | `identity` |
+| **MCP** | Tool protocol and validation | `mcp` |
+| **Bowserd** | Persistent autonomous daemon | `bowserd` |
+
+## ⚡ Autonomous by Design
+
+```text
+        DISCOVER
+           │
+           ▼
+       REGISTER ────────┐
+           │            │
+           ▼            │
+        ROUTE ◄─────────┤
+           │            │
+           ▼            │
+        EXECUTE         │
+           │            │
+           ▼            │
+       CHECKPOINT       │
+           │            │
+           ▼            │
+        RECOVER ────────┘
+           │
+           ▼
+       CONTINUE
+```
+
+GitHub is the public project/control substrate; Kairos is an always-on autonomous runtime; inference and execution providers are extensible through the capability fabric.
+
+## ✦ Visual Language
+
+- **🐢 Turtle / Nessy** — persistence, movement, resilience.
+- **BowserAI** — the orchestration identity.
+- **Monospace diagrams** — systems-first communication.
+- **High-contrast documentation** — fast scanning and precise navigation.
+- **Apache-2.0** — one clear project license.
+- **GitHub-native artifacts** — source, automation, releases, and project state in one public substrate.
+
+## 🚀 Build
 
 ```bash
-just check
-just test
-just fmt
-just clippy
+cargo check --workspace
+cargo test --workspace
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets --all-features -- -D warnings
 ```
 
-## Design principles
+Autonomous bootstrap is provided by `scripts/bootstrap.sh`.
 
-- Local-first execution and explicit provider boundaries.
-- Strongly typed protocol contracts instead of stringly typed orchestration.
-- No credentials in source control.
-- Deterministic builds and machine-verifiable CI gates.
-- Security-sensitive operations are represented explicitly in the domain model.
-- Optional distributed components remain behind replaceable traits.
+## 🧭 Repository Map
 
-## License
+```text
+.
+├── crates/
+│   ├── bowser-core/      domain contracts
+│   ├── turtle/           orchestration
+│   ├── koopa/            sandbox/execution
+│   ├── kairos/           always-on runtime
+│   ├── capability/       capability fabric
+│   ├── inference/        model/provider routing
+│   ├── storage/          durable CAS
+│   ├── identity/         autonomous identity
+│   ├── mcp/              MCP protocol
+│   └── bowserd/          daemon
+├── docs/                 architecture and engineering docs
+├── scripts/              autonomous bootstrap/tooling
+├── .github/              CI and repository automation
+├── ARCHITECTURE.md       system architecture
+├── AUTOMATION.md         autonomous engineering contract
+├── SECURITY.md           security architecture
+└── Cargo.toml             workspace definition
+```
 
-BowserAI/Nessy is released under the Apache License, Version 2.0. See `LICENSE` and `NOTICE` for details.
+## 📚 Documentation
+
+| Document | Purpose |
+|:--|:--|
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | System topology and subsystem boundaries |
+| [`AUTOMATION.md`](AUTOMATION.md) | Autonomous build and repository automation |
+| [`SECURITY.md`](SECURITY.md) | Security architecture and controls |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Engineering workflow |
+| [`LICENSE`](LICENSE) | Apache License 2.0 |
+
+<div align="center">
+
+### 🐢 BOWSERAI / NESSY
+
+**One fabric. Many runtimes. Persistent state. Autonomous operation.**
+
+[GitHub](https://github.com/SynthicsoftLabs/Nessy) · [Architecture](ARCHITECTURE.md) · [Security](SECURITY.md)
+
+</div>
