@@ -21,7 +21,12 @@ pub struct Scheduler {
 
 impl Scheduler {
     pub async fn enqueue(&self, session_id: SessionId, input: serde_json::Value) -> TaskId {
-        let task = Task { id: TaskId::new(), session_id, state: TaskState::Queued, input };
+        let task = Task {
+            id: TaskId::new(),
+            session_id,
+            state: TaskState::Queued,
+            input,
+        };
         let id = task.id;
         self.tasks.lock().await.insert(id, task);
         self.queue.lock().await.push_back(id);
@@ -30,7 +35,9 @@ impl Scheduler {
 
     pub async fn claim(&self) -> Result<Option<Task>, TurtleError> {
         let id = self.queue.lock().await.pop_front();
-        let Some(id) = id else { return Ok(None); };
+        let Some(id) = id else {
+            return Ok(None);
+        };
         let mut tasks = self.tasks.lock().await;
         let task = tasks.get_mut(&id).ok_or(TurtleError::TaskNotFound(id))?;
         if task.state != TaskState::Queued {
@@ -67,7 +74,9 @@ mod tests {
     async fn queue_claim_and_complete() {
         let scheduler = Scheduler::default();
         let session = SessionId::new();
-        let id = scheduler.enqueue(session, serde_json::json!({"prompt":"hello"})).await;
+        let id = scheduler
+            .enqueue(session, serde_json::json!({"prompt":"hello"}))
+            .await;
         let task = scheduler.claim().await.unwrap().unwrap();
         assert_eq!(task.id, id);
         assert_eq!(task.state, TaskState::Running);
