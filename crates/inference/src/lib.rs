@@ -56,7 +56,10 @@ impl InferenceRouter {
             .collect()
     }
 
-    pub async fn infer(&self, request: InferenceRequest) -> Result<InferenceResponse, InferenceError> {
+    pub async fn infer(
+        &self,
+        request: InferenceRequest,
+    ) -> Result<InferenceResponse, InferenceError> {
         let providers = self.providers.read().await.clone();
         let mut last_error = None;
         for provider in providers {
@@ -68,7 +71,8 @@ impl InferenceRouter {
                 Err(error) => last_error = Some(error),
             }
         }
-        Err(last_error.unwrap_or_else(|| InferenceError::Unavailable("no healthy providers".into())))
+        Err(last_error
+            .unwrap_or_else(|| InferenceError::Unavailable("no healthy providers".into())))
     }
 }
 
@@ -91,7 +95,10 @@ mod tests {
             true
         }
 
-        async fn infer(&self, request: InferenceRequest) -> Result<InferenceResponse, InferenceError> {
+        async fn infer(
+            &self,
+            request: InferenceRequest,
+        ) -> Result<InferenceResponse, InferenceError> {
             if !self.succeeds {
                 return Err(InferenceError::Provider("failed".into()));
             }
@@ -106,8 +113,18 @@ mod tests {
     #[tokio::test]
     async fn router_fails_over_to_next_provider() {
         let router = InferenceRouter::default();
-        router.register(Arc::new(Provider { name: "first", succeeds: false })).await;
-        router.register(Arc::new(Provider { name: "second", succeeds: true })).await;
+        router
+            .register(Arc::new(Provider {
+                name: "first",
+                succeeds: false,
+            }))
+            .await;
+        router
+            .register(Arc::new(Provider {
+                name: "second",
+                succeeds: true,
+            }))
+            .await;
         let response = router
             .infer(InferenceRequest {
                 model: Some("test".into()),
