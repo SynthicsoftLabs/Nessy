@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 pub mod agi;
+pub mod director;
 pub mod frontier;
 pub mod runtime;
 
@@ -118,8 +119,8 @@ mod tests {
             task_id: Uuid::new_v4(),
             required: [Capability::Inference].into_iter().collect(),
             candidates: vec![
-                runtime("local", 10, &[Capability::Inference]),
-                runtime("kairos", 100, &[Capability::Inference, Capability::PeerMesh]),
+                runtime("cloud", 100, &[Capability::Inference]),
+                runtime("kairos", 200, &[Capability::Inference, Capability::PeerMesh]),
             ],
         };
         assert_eq!(plan.select().unwrap().name, "kairos");
