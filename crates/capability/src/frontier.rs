@@ -82,10 +82,13 @@ mod tests {
         };
 
         assert!(profile.supports(FrontierCapability::Reasoning));
-        assert_eq!(profile.coverage(&[
-            FrontierCapability::Reasoning,
-            FrontierCapability::Mcp,
-            FrontierCapability::VideoGeneration,
-        ]), 2);
+        assert_eq!(
+            profile.coverage(&[
+                FrontierCapability::Reasoning,
+                FrontierCapability::Mcp,
+                FrontierCapability::VideoGeneration,
+            ]),
+            2
+        );
     }
 }
