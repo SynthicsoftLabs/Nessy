@@ -12,6 +12,7 @@ authors.workspace = true
 bowser-core = { path = "../bowser-core" }
 turtle = { path = "../turtle" }
 koopa = { path = "../koopa" }
+kairos-client = { path = "../kairos" }
 tokio.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
