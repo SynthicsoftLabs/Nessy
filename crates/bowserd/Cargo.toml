@@ -11,7 +11,7 @@ authors.workspace = true
 bowser-core = { path = "../bowser-core" }
 turtle = { path = "../turtle" }
 koopa = { path = "../koopa" }
-kairos = { path = "../kairos" }
+kairos = { package = "kairos-client", path = "../kairos" }
 capability = { path = "../capability" }
 inference = { path = "../inference" }
 tokio.workspace = true
