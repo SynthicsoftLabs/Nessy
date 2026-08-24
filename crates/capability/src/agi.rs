@@ -113,10 +113,7 @@ mod tests {
     #[test]
     fn graph_selects_best_healthy_provider() {
         let mut graph = CapabilityGraph::default();
-        for (id, provider, quality) in [
-            ("local", "local", 0.70),
-            ("frontier", "frontier", 0.99),
-        ] {
+        for (id, provider, quality) in [("local", "local", 0.70), ("frontier", "frontier", 0.99)] {
             graph.register(CapabilityNode {
                 id: id.into(),
                 capability: AgiCapability::Reasoning,
