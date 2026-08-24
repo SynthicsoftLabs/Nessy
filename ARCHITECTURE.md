@@ -2,70 +2,145 @@
 Copyright 2026 Synthicsoft Labs LLC
 Licensed under the Apache License, Version 2.0.
 -->
-# BowserAI Architecture
 
-BowserAI is an autonomous, distributed execution fabric. Local execution is one capability, not the system boundary. Remote always-on runtimes, peer runtimes, cloud providers, and local providers participate through common capability contracts.
+# 🐢 BowserAI Architecture
 
-## Runtime fabric
+> **NESSY · Autonomous Intelligence Fabric**
+>
+> One orchestration plane. Many runtimes. Durable state. Continuous recovery.
+
+---
+
+## ◈ Fabric Overview
+
+BowserAI is an autonomous, distributed execution fabric. Local execution is one capability—not the system boundary. Always-on runtimes, peer runtimes, GitHub-backed infrastructure, inference providers, and execution environments participate through common capability contracts.
 
 ```text
-                         BOWSERAI
-                            │
-                ┌───────────┴───────────┐
-                │   Capability Router   │
-                └───────────┬───────────┘
-                            │
-        ┌───────────────────┼───────────────────┐
-        ▼                   ▼                   ▼
-     KAIROS             PEER RUNTIMES       INFERENCE
-   always-on daemon       libp2p mesh       provider pool
-        │                   │                   │
-        └───────────────────┼───────────────────┘
-                            ▼
-                     TURTLE ORCHESTRATOR
-                  queues / CRDT / recovery
-                            │
-                ┌───────────┼───────────┐
-                ▼           ▼           ▼
-             KOOPA       STORAGE      MCP
-             execute      durable      tools
-                │           │           │
-       ┌────────┼──────┐    ├── SQLite  ├── HTTP
-       ▼        ▼      ▼    ├── Postgres├── stdio
-      WASI   Container MicroVM├── CAS/IPFS└── WebSocket
-                              └── replicas
+                                      ┌─────────────────────┐
+                                      │      BOWSERAI       │
+                                      │  AUTONOMOUS FABRIC  │
+                                      └──────────┬──────────┘
+                                                 │
+                                      ┌──────────▼──────────┐
+                                      │  CAPABILITY ROUTER  │
+                                      └──────────┬──────────┘
+                                                 │
+                  ┌──────────────────────────────┼──────────────────────────────┐
+                  │                              │                              │
+                  ▼                              ▼                              ▼
+          ┌────────────────┐            ┌────────────────┐            ┌────────────────┐
+          │     KAIROS     │            │   PEER RUNTIMES │            │    INFERENCE   │
+          │    ALWAYS-ON   │            │    LIBP2P MESH  │            │ PROVIDER POOL  │
+          └───────┬────────┘            └───────┬────────┘            └───────┬────────┘
+                  └─────────────────────────────┼──────────────────────────────┘
+                                                ▼
+                                  ┌────────────────────────┐
+                                  │    TURTLE ORCHESTRATOR  │
+                                  │ queues · state · CRDT   │
+                                  │ recovery · scheduling   │
+                                  └────────────┬───────────┘
+                                               │
+                         ┌─────────────────────┼─────────────────────┐
+                         ▼                     ▼                     ▼
+                  ┌─────────────┐      ┌─────────────┐       ┌─────────────┐
+                  │    KOOPA    │      │   STORAGE   │       │     MCP     │
+                  │  EXECUTION  │      │ DURABLE CAS │       │    TOOLS    │
+                  └──────┬──────┘      └──────┬──────┘       └──────┬──────┘
+                         │                    │                     │
+                  WASI · containers     GitHub · SQLite        HTTP · stdio
+                  microVM · remote      Postgres · IPFS       WebSocket · P2P
 ```
 
-## Autonomous runtime selection
+## ◇ Runtime Fabric
 
-`capability` defines runtime descriptors and required capabilities. A task can carry multiple eligible runtimes. Selection uses capability compatibility, health, priority, and runtime identity. The design permits health-driven failover and migration without coupling tasks to a single provider.
+The `capability` layer describes what a runtime can do. Selection can combine capability compatibility, health, priority, identity, and availability. Tasks retain identity independently of their selected execution provider, allowing the orchestration layer to continue through provider changes.
 
-## Kairos
+| Fabric | Responsibility |
+|:--|:--|
+| **Kairos** | Always-on autonomous runtime integration |
+| **Peer mesh** | Distributed runtime capacity and synchronization |
+| **Inference** | Model/provider discovery and routing |
+| **GitHub backend** | Public project/control substrate and repository state |
+| **Turtle** | Task lifecycle, queues, scheduling, recovery |
+| **Koopa** | Sandboxed execution backends |
+| **Storage** | Durable content-addressed objects and state |
+| **MCP** | Tool discovery, validation, and transport |
 
-`kairos` is a first-class runtime integration. Its endpoint is configurable through `KAIROS_URL` and defaults to `https://the-real-kairos.com`. The adapter is deliberately protocol-neutral at this layer so the concrete Kairon daemon transport can be implemented without baking an invented wire contract into the core.
+## ⚡ Autonomous Selection Loop
 
-## Inference
+```text
+          DISCOVER
+             │
+             ▼
+          REGISTER
+             │
+             ▼
+       MATCH CAPABILITIES
+             │
+             ▼
+          SCORE / ROUTE
+             │
+             ▼
+           EXECUTE
+             │
+             ▼
+         CHECKPOINT
+             │
+       ┌─────┴─────┐
+       │           │
+    HEALTHY     FAILURE
+       │           │
+       ▼           ▼
+    CONTINUE    RECOVER
+                   │
+                   ▼
+              RE-ROUTE
+                   │
+                   └──────────────► EXECUTE
+```
 
-`inference` defines a provider-neutral interface. Providers are registered dynamically and are attempted in sequence with health checks and failure propagation. Local models, Kairos-backed inference, OpenAI-compatible gateways, and additional providers belong behind this interface.
+## 🛰️ Kairos
 
-## Turtle
+`kairos` is a first-class autonomous runtime integration. Its endpoint is configurable through `KAIROS_URL`, with the project default targeting `https://the-real-kairos.com`. The adapter boundary keeps transport-specific details isolated from core orchestration contracts.
 
-`turtle` owns durable orchestration semantics: task identity, queueing, claiming, lifecycle transitions, recovery, and eventually CRDT/libp2p replication. Transport and provider implementations remain outside the domain model.
+## 🧠 Inference
 
-## Koopa
+`inference` defines a provider-neutral interface. Providers are dynamically registered and health-aware. Local models, Kairos-backed inference, OpenAI-compatible gateways, and additional providers belong behind the same routing surface.
 
-`koopa` defines the execution boundary. Backends include WASI, containers, microVMs, remote execution, and native policy-controlled runners. The backend selection mechanism is capability-driven rather than tied to one runtime.
+## 🐢 Turtle
 
-## State and redundancy
+Turtle owns orchestration semantics: task identity, queueing, claiming, lifecycle transitions, persistence, recovery, and distributed synchronization. Providers and transports remain replaceable.
 
-State is designed around durable task identities, checkpoints, content-addressed artifacts, replicated metadata, and recoverable execution plans. Storage providers can be layered without changing task semantics.
+## 🛡️ Koopa
 
-## Failure domains
+Koopa is the execution boundary. The architecture accommodates WASI, containers, microVMs, remote execution, and policy-controlled native runners. Backend selection is capability-driven.
 
-No single provider, runtime, transport, storage engine, model host, or execution backend is intended to be authoritative for the whole platform. Health, routing, persistence, and recovery are cross-cutting services so that an unavailable component can be replaced by another compatible component.
+## 💾 State & Redundancy
 
-## Extension order
+Durable task identity, checkpoints, content-addressed artifacts, replicated metadata, and recoverable execution plans keep state independent of any single runtime. GitHub, databases, and content-addressed storage can participate as persistence layers without changing task semantics.
 
-The implementation proceeds across all layers rather than making one narrow path the product: identity, storage, inference, Kairos integration, distributed synchronization, sandbox backends, MCP transports, observability, clients, deployment, reproducible distribution, and automated recovery are all part of the platform architecture.
+## 🔗 Dependency Direction
 
-Every layer preserves dependency direction toward `bowser-core` and capability contracts. Shared domain types do not acquire provider-specific assumptions.
+```text
+                   provider-specific systems
+                            │
+                 ┌──────────┼──────────┐
+                 ▼          ▼          ▼
+              Kairos     GitHub     Inference
+                 │          │          │
+                 └──────────┼──────────┘
+                            ▼
+                    capability contracts
+                            │
+                            ▼
+                         Turtle
+                            │
+                            ▼
+                       bowser-core
+```
+
+Shared domain contracts remain provider-neutral. Provider-specific behavior terminates at adapter boundaries rather than leaking into the core model.
+
+## ✦ Platform Surface
+
+The architecture encompasses identity, storage, inference, Kairos integration, distributed synchronization, sandbox backends, MCP transports, observability, clients, deployment, reproducible distribution, and automated recovery as one platform rather than isolated optional projects.
