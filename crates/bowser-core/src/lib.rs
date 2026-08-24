@@ -8,22 +8,30 @@ use uuid::Uuid;
 pub struct SessionId(Uuid);
 
 impl SessionId {
-    pub fn new() -> Self { Self(Uuid::new_v4()) }
+    pub fn new() -> Self {
+        Self(Uuid::new_v4())
+    }
 }
 
 impl Default for SessionId {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct TaskId(Uuid);
 
 impl TaskId {
-    pub fn new() -> Self { Self(Uuid::new_v4()) }
+    pub fn new() -> Self {
+        Self(Uuid::new_v4())
+    }
 }
 
 impl Default for TaskId {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -74,7 +82,9 @@ pub fn validate_tool(tool: &ToolDescriptor) -> Result<(), CoreError> {
         return Err(CoreError::InvalidTool("tool name exceeds 128 bytes".into()));
     }
     if tool.description.len() > 16_384 {
-        return Err(CoreError::InvalidTool("tool description exceeds 16 KiB".into()));
+        return Err(CoreError::InvalidTool(
+            "tool description exceeds 16 KiB".into(),
+        ));
     }
     Ok(())
 }
@@ -94,7 +104,10 @@ mod tests {
         let tool = ToolDescriptor {
             name: " ".into(),
             description: String::new(),
-            annotation: ToolAnnotation { read_only_hint: true, destructive_hint: false },
+            annotation: ToolAnnotation {
+                read_only_hint: true,
+                destructive_hint: false,
+            },
         };
         assert!(validate_tool(&tool).is_err());
     }
