@@ -1,100 +1,86 @@
-<!--
-Copyright 2026 Synthicsoft Labs LLC
-Licensed under the Apache License, Version 2.0.
--->
+<!-- Copyright 2026 Synthicsoft Labs LLC; Licensed under Apache-2.0. -->
 
 # 🛡️ Nessy Security
 
-> **Security is a fabric property.** Identity, execution, networking, storage, tools, and automation are secured at their boundaries and composed into one auditable runtime.
+> **Autonomous does not mean undefined.** Nessy can operate without a human in the loop while retaining explicit security semantics, authenticated identity, auditable state, and selectable execution policy.
 
----
-
-## ◈ Security Model
+## ◈ Security Fabric
 
 ```text
-                         ┌─────────────────────┐
-                         │      BOWSERAI       │
-                         │   TRUST BOUNDARY    │
-                         └──────────┬──────────┘
-                                    │
-          ┌─────────────────────────┼─────────────────────────┐
-          ▼                         ▼                         ▼
-     ┌──────────┐             ┌──────────┐             ┌──────────┐
-     │ IDENTITY │             │  KOOPA   │             │   MCP    │
-     │   KEYS   │             │ EXECUTE  │             │  TOOLS   │
-     └────┬─────┘             └────┬─────┘             └────┬─────┘
-          │                        │                        │
-          └────────────────────────┼────────────────────────┘
-                                   ▼
+                       ┌─────────────────────┐
+                       │      BOWSERAI       │
+                       │ AUTONOMOUS FABRIC   │
+                       └──────────┬──────────┘
+                                  │
+        ┌─────────────────────────┼─────────────────────────┐
+        ▼                         ▼                         ▼
+   ┌──────────┐             ┌──────────┐             ┌──────────┐
+   │ IDENTITY │             │  KOOPA   │             │   MCP    │
+   │   KEYS   │             │ EXECUTE  │             │  TOOLS   │
+   └────┬─────┘             └────┬─────┘             └────┬─────┘
+        └─────────────────────────┼─────────────────────────┘
+                                  ▼
                          ┌──────────────────┐
-                         │ POLICY + AUDIT   │
+                         │ POLICY / AUDIT   │
                          │ VALIDATE · TRACE │
                          └────────┬─────────┘
                                   │
-                    ┌─────────────┼─────────────┐
-                    ▼             ▼             ▼
-                 STORAGE       NETWORK       RUNTIME
+                  ┌───────────────┼───────────────┐
+                  ▼               ▼               ▼
+               STORAGE         NETWORK         RUNTIME
 ```
 
 ## 🔐 Identity
 
-Agent and user identity are explicit domain objects. Credentials are runtime inputs, never source-controlled artifacts. Identity material belongs in encrypted runtime storage, operating-system credential stores, or delegated credential providers.
-
-The architecture supports key-based identities, WebAuthn/passkeys, DID-oriented identity, and OAuth2.1/PKCE integration through replaceable authentication adapters.
+Agent identity is explicit and durable. Credentials are runtime inputs and are not committed to source control. The identity subsystem can support key-based identities, DID-oriented identity, WebAuthn/passkeys, and OAuth2.1/PKCE through adapters.
 
 ## 🧱 Execution
 
-Koopa defines the execution boundary. Sandboxed execution backends can include WASI, containers, microVMs, remote execution, and policy-controlled native runners.
-
-Execution requests carry explicit capability and policy information. Tool metadata distinguishes read-only behavior from destructive behavior instead of inferring privilege from natural-language descriptions.
+Koopa provides selectable execution backends including WASI, containers, microVMs, remote runners, and policy-controlled native execution. Autonomous operation does not require a human approval step between task transitions; authorization is expressed through machine-readable capabilities and runtime policy.
 
 ## 🌐 Network
 
-Network-capable components use explicit transport adapters, bounded request lifetimes, structured errors, retry policy, and health-aware routing. Provider failure is represented as a runtime condition so the orchestration fabric can select another compatible capability.
+Network adapters use authenticated transport, request deadlines, structured errors, retry policy, health signals, and provider failover. The capability fabric can move work between available compatible runtimes without changing task identity.
 
 ## 🧰 MCP
 
-MCP tool descriptors are validated before registration and dispatch. Content-addressed representations can be used to identify tool definitions and support deterministic cache/integrity checks.
+MCP tools are validated at registration and dispatch. Tool metadata, transport identity, authorization context, and content-addressed definitions form the machine-readable basis for tool execution.
 
-## 💾 State
+## 💾 Durable State
 
-Durable state is separated from ephemeral execution. Content-addressed artifacts are integrity checked, task identity persists independently of a runtime, and storage adapters can participate in redundant persistence topologies.
+Task identity and checkpoints are independent of the runtime executing a task. Content-addressed artifacts provide integrity verification. GitHub, persistent databases, and content-addressed storage can participate in redundant persistence topologies.
 
 ## 🔑 Secrets
 
-Never commit private keys, access tokens, passwords, session cookies, or production secret material.
-
-Preferred sources are:
-
-1. encrypted runtime secret storage;
-2. operating-system credential stores;
-3. hardware-backed credentials where available;
-4. environment injection for deployment systems;
-5. delegated secret providers.
+Private keys, access tokens, passwords, cookies, and production credentials remain outside source control. Runtime secret sources include encrypted storage, operating-system credential stores, hardware-backed credentials, deployment secret injection, and delegated secret providers.
 
 ## 🔎 Supply Chain
 
-Repository automation is designed to validate formatting, compilation, tests, dependency policy, security auditing, SBOM generation, and artifact integrity. Dependencies remain subject to the project's Apache-2.0 compatibility policy and repository security controls.
+Repository automation validates formatting, compilation, tests, dependency policy, security auditing, SBOM generation, and artifact integrity. Dependencies remain governed by the project's Apache-2.0 licensing requirements.
 
-## 🧭 Security Operations
+## 🛰️ Autonomous Security Operations
 
-Security signals should remain machine-readable and auditable. Runtime health, authorization decisions, tool dispatch, provider selection, artifact integrity, and recovery events belong in structured telemetry without exposing secret material.
+```text
+DISCOVER → AUTHENTICATE → AUTHORIZE → EXECUTE → CHECKPOINT
+    ▲                                             │
+    └──────────── HEALTH / RECOVERY ◄─────────────┘
+```
 
-For a vulnerability, use GitHub's private security-advisory mechanism when available. Do not place undisclosed exploit details in a public issue.
-
----
+Security telemetry remains machine-readable and auditable. Health, authorization, tool dispatch, provider selection, artifact integrity, and recovery events can be recorded without exposing secret material.
 
 ## ✦ Security Principles
 
-| Principle | Implementation direction |
+| Principle | Nessy implementation |
 |:--|:--|
-| **Explicit identity** | Agents and credentials have durable identities |
-| **Bounded authority** | Capabilities are granted explicitly |
-| **Isolated execution** | Koopa owns execution boundaries |
-| **Validated tools** | MCP metadata is checked before dispatch |
-| **Durable integrity** | Content addressing verifies stored artifacts |
-| **Provider independence** | Routing does not depend on one runtime |
-| **Auditable automation** | CI and runtime events remain observable |
-| **No source secrets** | Credentials stay outside Git |
+| **Autonomous operation** | No mandatory human approval loop in normal execution |
+| **Explicit authority** | Capabilities and policies are machine-readable |
+| **Identity** | Durable agent and credential identity |
+| **Execution isolation** | Koopa execution backends |
+| **Tool validation** | MCP registration and dispatch validation |
+| **Integrity** | Content-addressed state and artifacts |
+| **Provider independence** | Capability-driven runtime selection |
+| **Recovery** | Persistent checkpoints and automatic re-routing |
+| **Auditability** | Structured runtime and repository telemetry |
+| **Secret separation** | Credentials remain outside source |
 
-> 🐢 **Nessy security follows the same architectural principle as the rest of the fabric: no single component should silently become the whole trust model.**
+> 🐢 **Nessy is autonomous in operation while remaining explicit about identity, authority, state, and execution semantics.**
