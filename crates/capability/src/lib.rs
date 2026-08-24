@@ -64,7 +64,9 @@ impl RuntimeDescriptor {
     where
         I: IntoIterator<Item = Capability>,
     {
-        required.into_iter().all(|cap| self.capabilities.contains(&cap))
+        required
+            .into_iter()
+            .all(|cap| self.capabilities.contains(&cap))
     }
 
     pub fn fingerprint(&self) -> String {
@@ -91,7 +93,9 @@ impl ExecutionPlan {
     pub fn select(&self) -> Result<RuntimeDescriptor, RoutingError> {
         self.candidates
             .iter()
-            .filter(|runtime| runtime.healthy && runtime.supports_all(self.required.iter().cloned()))
+            .filter(|runtime| {
+                runtime.healthy && runtime.supports_all(self.required.iter().cloned())
+            })
             .max_by_key(|runtime| runtime.priority)
             .cloned()
             .ok_or(RoutingError::NoCapableRuntime)
@@ -120,7 +124,11 @@ mod tests {
             required: [Capability::Inference].into_iter().collect(),
             candidates: vec![
                 runtime("cloud", 100, &[Capability::Inference]),
-                runtime("kairos", 200, &[Capability::Inference, Capability::PeerMesh]),
+                runtime(
+                    "kairos",
+                    200,
+                    &[Capability::Inference, Capability::PeerMesh],
+                ),
             ],
         };
         assert_eq!(plan.select().unwrap().name, "kairos");
