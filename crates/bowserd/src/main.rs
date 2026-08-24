@@ -14,7 +14,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let scheduler = Arc::new(Scheduler::default());
     let kairos = kairos::KairosClient::from_environment()?;
-    info!(kairos_endpoint = kairos.base_url(), "autonomous runtime initialized");
+    info!(
+        kairos_endpoint = kairos.base_url(),
+        "autonomous runtime initialized"
+    );
 
     let runtime = capability::RuntimeDescriptor {
         id: uuid::Uuid::new_v4(),
