@@ -1,0 +1,17 @@
+# Copyright 2026 Synthicsoft Labs LLC
+# Licensed under Apache-2.0 OR MIT.
+[package]
+name = "bowserd"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+authors.workspace = true
+
+[dependencies]
+bowser-core = { path = "../bowser-core" }
+turtle = { path = "../turtle" }
+koopa = { path = "../koopa" }
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
