@@ -5,14 +5,15 @@ name = "bowserd"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-
 authors.workspace = true
 
 [dependencies]
 bowser-core = { path = "../bowser-core" }
 turtle = { path = "../turtle" }
 koopa = { path = "../koopa" }
-kairos-client = { path = "../kairos" }
+kairos = { path = "../kairos" }
+capability = { path = "../capability" }
+inference = { path = "../inference" }
 tokio.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
