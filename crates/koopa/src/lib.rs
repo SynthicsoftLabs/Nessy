@@ -40,7 +40,9 @@ pub struct DenyAllSandbox;
 #[async_trait]
 impl Sandbox for DenyAllSandbox {
     async fn execute(&self, _request: ExecutionRequest) -> Result<ExecutionOutput, SandboxError> {
-        Err(SandboxError::Rejected("no execution backend is enabled".into()))
+        Err(SandboxError::Rejected(
+            "no execution backend is enabled".into(),
+        ))
     }
 }
 
@@ -55,11 +57,13 @@ mod tests {
     #[tokio::test]
     async fn deny_all_never_executes_host_code() {
         let sandbox = DenyAllSandbox;
-        let result = sandbox.execute(ExecutionRequest {
-            program: "echo".into(),
-            args: vec!["hello".into()],
-            timeout_ms: 1000,
-        }).await;
+        let result = sandbox
+            .execute(ExecutionRequest {
+                program: "echo".into(),
+                args: vec!["hello".into()],
+                timeout_ms: 1000,
+            })
+            .await;
         assert!(matches!(result, Err(SandboxError::Rejected(_))));
     }
 
