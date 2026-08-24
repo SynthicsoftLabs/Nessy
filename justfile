@@ -1,5 +1,5 @@
 # Copyright 2026 Synthicsoft Labs LLC
-# Licensed under Apache-2.0 OR MIT.
+# Licensed under the Apache License, Version 2.0.
 
 check:
     cargo check --workspace --all-targets
@@ -20,4 +20,7 @@ security:
     cargo audit
     cargo deny check
 
-all: fmt check test clippy
+license:
+    @! grep -RInE 'Apache-2.0 OR MIT|Apache License, Version 2.0; and MIT|dual Apache|Apache-2.0/MIT|and/or the MIT License' --exclude-dir=.git .
+
+all: fmt check test clippy security license
