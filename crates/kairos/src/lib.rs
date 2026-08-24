@@ -88,6 +88,9 @@ mod tests {
 
     #[test]
     fn rejects_non_http_urls() {
-        assert!(matches!(KairosClient::new("file:///tmp"), Err(KairosError::InvalidUrl)));
+        assert!(matches!(
+            KairosClient::new("file:///tmp"),
+            Err(KairosError::InvalidUrl)
+        ));
     }
 }
