@@ -16,7 +16,7 @@
 
 **Nessy is the engineering foundation of BowserAI:** an autonomous intelligence fabric coordinating AGI capabilities, frontier model providers, runtimes, inference, execution, identity, durable state, MCP tools, research, learning, and distributed infrastructure through one coherent system.
 
-### 💬 [**CHAT WITH NESSY**](https://synthicsoftlabs.github.io/Nessy/)
+### 💬 [**CHAT WITH NESSY**](https://html-preview.github.io/?url=https://github.com/SynthicsoftLabs/Nessy/blob/main/docs/chat/index.html)
 
 **Open the live BowserAI interface directly from this repository.**
 
@@ -30,7 +30,7 @@
 
 ## ◈ Live Intelligence Interface
 
-The repository now ships its own browser-native Nessy interface at [`docs/chat`](docs/chat). GitHub Pages publishes that interface automatically through [`.github/workflows/pages.yml`](.github/workflows/pages.yml), giving visitors a polished chat surface from the repository's public landing experience.
+The repository ships its browser-native Nessy interface at [`docs/chat/index.html`](docs/chat/index.html). The README chat button uses a repository HTML renderer so the interface is accessible without depending on an unpublished GitHub Pages site.
 
 ```text
 GitHub Repository
@@ -42,21 +42,19 @@ GitHub Repository
   CHAT WITH NESSY
        │
        ▼
- GitHub Pages UI
+Repository HTML Renderer
+       │
+       ▼
+  BowserAI Chat UI
        │
        ▼
   Kairos / Chat API
        │
        ▼
  Nessy Intelligence Fabric
-       │
- ┌─────┼─────────────────────────────┐
- ▼     ▼        ▼        ▼           ▼
-AGI  Memory   Tools   Research    Frontier
-Graph  Graph   MCP      Engine     Providers
 ```
 
-The chat surface is deliberately dependency-free: a single browser application with streaming-ready request handling, session continuity, capability declarations, responsive layout, keyboard-friendly composition, and an endpoint override through `?endpoint=`. The default runtime endpoint is the Kairos chat endpoint configured in the application.
+The chat surface is dependency-free: a single browser application with session continuity, capability declarations, responsive layout, keyboard-friendly composition, and endpoint configuration through `?endpoint=`. The application source is versioned directly in this repository.
 
 ## ◈ System Fabric
 
@@ -201,13 +199,11 @@ Autonomous bootstrap is provided by `scripts/bootstrap.sh`.
 │   ├── github-backend/   GitHub backend
 │   └── bowserd/          daemon
 ├── docs/
-│   ├── chat/             live browser chat interface
+│   ├── chat/             repository-native chat UI
 │   ├── AGI_CAPABILITY_MATRIX.md
 │   └── ...
 ├── scripts/              autonomous tooling
-├── .github/
-│   └── workflows/
-│       └── pages.yml     chat deployment
+├── .github/              repository automation
 ├── ARCHITECTURE.md       system topology
 ├── AUTOMATION.md         autonomous engineering contract
 ├── SECURITY.md           security architecture
@@ -220,8 +216,8 @@ Autonomous bootstrap is provided by `scripts/bootstrap.sh`.
 | Document | Purpose |
 |:--|:--|
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Full system topology and runtime fabric |
+| [`docs/chat/index.html`](docs/chat/index.html) | Browser chat interface |
 | [`docs/AGI_CAPABILITY_MATRIX.md`](docs/AGI_CAPABILITY_MATRIX.md) | AGI domains and frontier-provider capability map |
-| [`docs/chat`](docs/chat) | Browser-native Nessy chat surface |
 | [`AUTOMATION.md`](AUTOMATION.md) | Autonomous engineering and repository automation |
 | [`SECURITY.md`](SECURITY.md) | Security architecture |
 | [`NOTICE`](NOTICE) | Creator attribution and legal notice |
@@ -234,8 +230,8 @@ Autonomous bootstrap is provided by `scripts/bootstrap.sh`.
 
 **Created by Adam Joseph Rivers · CEO, Synthicsoft Labs LLC**
 
-**AGI capability fabric · Frontier model fabric · Autonomous runtime · Live chat**
+**AGI capability fabric · Frontier model fabric · Autonomous runtime**
 
-[💬 Chat with Nessy](https://synthicsoftlabs.github.io/Nessy/) · [GitHub](https://github.com/SynthicsoftLabs/Nessy) · [Architecture](ARCHITECTURE.md) · [AGI Matrix](docs/AGI_CAPABILITY_MATRIX.md) · [Security](SECURITY.md)
+[GitHub](https://github.com/SynthicsoftLabs/Nessy) · [Architecture](ARCHITECTURE.md) · [AGI Matrix](docs/AGI_CAPABILITY_MATRIX.md) · [Chat UI](docs/chat/index.html) · [Security](SECURITY.md)
 
 </div>
