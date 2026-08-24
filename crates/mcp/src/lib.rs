@@ -1,7 +1,7 @@
 // Copyright 2026 Synthicsoft Labs LLC
 // Licensed under the Apache License, Version 2.0.
 
-use bowser_core::{validate_tool, ToolDescriptor};
+use bowser_core::{ToolDescriptor, validate_tool};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
@@ -57,8 +57,12 @@ pub enum McpError {
 
 impl JsonRpcRequest {
     pub fn validate(&self) -> Result<(), McpError> {
-        if self.jsonrpc != "2.0" { return Err(McpError::InvalidVersion); }
-        if self.method.is_empty() || self.method.len() > 256 { return Err(McpError::InvalidMethod); }
+        if self.jsonrpc != "2.0" {
+            return Err(McpError::InvalidVersion);
+        }
+        if self.method.is_empty() || self.method.len() > 256 {
+            return Err(McpError::InvalidMethod);
+        }
         Ok(())
     }
 }
@@ -105,18 +109,29 @@ mod tests {
 
     #[test]
     fn rpc_validation_requires_v2() {
-        let req = JsonRpcRequest { jsonrpc: "1.0".into(), id: None, method: "ping".into(), params: Value::Null };
+        let req = JsonRpcRequest {
+            jsonrpc: "1.0".into(),
+            id: None,
+            method: "ping".into(),
+            params: Value::Null,
+        };
         assert!(matches!(req.validate(), Err(McpError::InvalidVersion)));
     }
 
     #[tokio::test]
     async fn registry_returns_stable_content_digest() {
         let registry = ToolRegistry::default();
-        registry.register(ToolDescriptor {
-            name: "ping".into(),
-            description: "Health check".into(),
-            annotation: ToolAnnotation { read_only_hint: true, destructive_hint: false },
-        }).await.unwrap();
+        registry
+            .register(ToolDescriptor {
+                name: "ping".into(),
+                description: "Health check".into(),
+                annotation: ToolAnnotation {
+                    read_only_hint: true,
+                    destructive_hint: false,
+                },
+            })
+            .await
+            .unwrap();
         let digest = registry.content_digest("ping").await.unwrap();
         assert!(digest.starts_with("sha256:"));
         assert_eq!(digest, registry.content_digest("ping").await.unwrap());
