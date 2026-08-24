@@ -1,14 +1,15 @@
 # Copyright 2026 Synthicsoft Labs LLC
-# Licensed under Apache-2.0 OR MIT.
+# Licensed under the Apache License, Version 2.0.
 name: CI
 
 on:
   push:
-    branches: [main, bowserai-foundation]
+    branches: [main, bowserai-foundation, bowserai-autonomous-v2]
   pull_request:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   rust:
@@ -31,6 +32,9 @@ jobs:
         uses: actions-rust-lang/audit@v1
       - name: License and advisory policy
         uses: EmbarkStudios/cargo-deny-action@v2
+      - name: Project license assertion
+        run: |
+          ! grep -RInE 'Apache-2.0 OR MIT|Apache License, Version 2.0; and MIT|dual Apache|Apache-2.0/MIT|and/or the MIT License' --exclude-dir=.git .
 
   sbom:
     runs-on: ubuntu-latest
