@@ -74,7 +74,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Assert Apache-2.0-only project licensing
         run: |
-          ! grep -RInE 'Apache-2.0 OR MIT|Apache License, Version 2.0; and MIT|dual Apache|Apache-2.0/MIT|and/or the MIT License' --exclude-dir=.git .
+          grep -q 'license.workspace = true' crates/bowserd/Cargo.toml
+          grep -q '^license = "Apache-2.0"' Cargo.toml
+          ! grep -RInE 'Apache-2.0 OR MIT|Apache License, Version 2.0; and MIT|dual Apache|Apache-2.0/MIT|and/or the MIT License' --exclude-dir=.git --exclude='ci.yml' .
 
   sbom:
     name: SBOM
