@@ -1,6 +1,6 @@
 <!--
 Copyright 2026 Synthicsoft Labs LLC
-Licensed under the Apache License, Version 2.0; and MIT License.
+Licensed under the Apache License, Version 2.0.
 -->
 # Security
 
@@ -12,7 +12,7 @@ Network-capable components must enforce bounded timeouts and explicit error hand
 
 ## Dependency security
 
-CI runs RustSec auditing and `cargo-deny` policy checks. Dependency additions should include their license and source implications in the review.
+CI runs RustSec auditing and `cargo-deny` policy checks. Dependency additions must remain compatible with the Apache License, Version 2.0 and must not introduce an unapproved licensing obligation.
 
 ## Secrets
 
