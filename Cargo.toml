@@ -11,6 +11,7 @@ members = [
   "crates/kairos",
   "crates/capability",
   "crates/inference",
+  "crates/storage",
 ]
 
 [workspace.package]
