@@ -58,7 +58,10 @@ impl Director {
     pub fn think(&self, goal: &Goal) -> Thought {
         Thought {
             goal_id: goal.id,
-            statement: format!("Decompose objective into executable capabilities: {}", goal.objective),
+            statement: format!(
+                "Decompose objective into executable capabilities: {}",
+                goal.objective
+            ),
             assumptions: vec!["Requested capabilities are the planning contract.".into()],
             evidence: Vec::new(),
         }
@@ -75,7 +78,10 @@ impl Director {
                 objective: goal.objective.clone(),
             })
             .collect();
-        Plan { goal_id: goal.id, steps }
+        Plan {
+            goal_id: goal.id,
+            steps,
+        }
     }
 
     pub fn evaluate(&self, plan: &Plan, observations: &[Observation]) -> bool {
@@ -92,7 +98,10 @@ impl Director {
         Goal {
             id: Uuid::new_v4(),
             objective: if completed == cycle.plan.steps.len() {
-                format!("Advance the objective beyond completed state: {}", cycle.goal.objective)
+                format!(
+                    "Advance the objective beyond completed state: {}",
+                    cycle.goal.objective
+                )
             } else {
                 format!("Recover and continue objective: {}", cycle.goal.objective)
             },
@@ -104,7 +113,12 @@ impl Director {
     pub fn cycle(&self, goal: Goal, graph: &CapabilityGraph) -> AutonomousCycle {
         let thought = self.think(&goal);
         let plan = self.plan(&goal, graph);
-        AutonomousCycle { goal, thought, plan, observations: Vec::new() }
+        AutonomousCycle {
+            goal,
+            thought,
+            plan,
+            observations: Vec::new(),
+        }
     }
 }
 
@@ -129,12 +143,21 @@ mod tests {
             latency_ms: 1,
             healthy: true,
         });
-        let goal = Goal { id: Uuid::new_v4(), objective: "solve the task".into(), required: vec![AgiCapability::Reasoning], priority: 1 };
+        let goal = Goal {
+            id: Uuid::new_v4(),
+            objective: "solve the task".into(),
+            required: vec![AgiCapability::Reasoning],
+            priority: 1,
+        };
         let director = Director;
         let cycle = director.cycle(goal, &graph);
         assert!(!cycle.thought.statement.is_empty());
         assert_eq!(cycle.plan.steps.len(), 1);
-        let observation = Observation { step_id: cycle.plan.steps[0].id, result: "complete".into(), success: true };
+        let observation = Observation {
+            step_id: cycle.plan.steps[0].id,
+            result: "complete".into(),
+            success: true,
+        };
         assert!(director.evaluate(&cycle.plan, &[observation]));
     }
 }
