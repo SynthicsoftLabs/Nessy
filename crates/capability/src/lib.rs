@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 pub mod agi;
+pub mod cognitive;
 pub mod director;
 pub mod frontier;
 pub mod runtime;
