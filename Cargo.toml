@@ -12,6 +12,7 @@ members = [
   "crates/capability",
   "crates/inference",
   "crates/storage",
+  "crates/identity",
 ]
 
 [workspace.package]
