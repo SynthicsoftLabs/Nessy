@@ -81,7 +81,8 @@ impl ToolRegistry {
 
     pub async fn content_digest(&self, name: &str) -> Result<String, McpError> {
         let tool = self.get(name).await.ok_or(McpError::ToolNotFound)?;
-        let encoded = serde_json::to_vec(&tool).map_err(|_| McpError::InvalidTool("serialization failed".into()))?;
+        let encoded = serde_json::to_vec(&tool)
+            .map_err(|_| McpError::InvalidTool("serialization failed".into()))?;
         let digest = Sha256::digest(encoded);
         Ok(format!("sha256:{}", hex_encode(&digest)))
     }
