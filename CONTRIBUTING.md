@@ -1,21 +1,23 @@
 <!--
 Copyright 2026 Synthicsoft Labs LLC
-Licensed under the Apache License, Version 2.0; and MIT License.
+Licensed under the Apache License, Version 2.0.
 -->
 # Contributing
 
 ## Workflow
 
-1. Create a focused branch from `main`.
-2. Keep changes scoped to one architectural concern.
-3. Run `just all` before opening a pull request.
-4. Include tests for changed behavior and update architectural documentation when boundaries change.
-5. Never commit credentials or generated secrets.
+Changes are produced and validated by automation. The repository's CI gates are authoritative for formatting, compilation, tests, linting, dependency advisories, licensing, and SBOM generation.
+
+1. Automation creates a focused change.
+2. Automation validates the complete workspace.
+3. Failed gates block promotion and may trigger automated repair.
+4. Successful changes may be promoted according to repository automation policy.
+5. Credentials and generated secrets are never committed.
 
 ## Code standards
 
 Rust code is formatted with `rustfmt` and must pass Clippy with warnings denied. Public interfaces should have explicit ownership, error, and lifecycle semantics.
 
-## Pull requests
+## Security
 
-Describe the architectural change, security implications, test commands, and any compatibility impact. CI is authoritative for formatting, compilation, tests, linting, dependency advisories, and SBOM generation.
+Privileged execution remains deny-by-default. Network access, credentials, filesystem access, and external providers must remain behind explicit capability boundaries.
