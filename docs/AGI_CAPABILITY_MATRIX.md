@@ -1,75 +1,59 @@
-<!-- Copyright 2026 Synthicsoft Labs LLC; Licensed under Apache-2.0. -->
+<!-- Copyright 2026 Adam Joseph Rivers, CEO, Synthicsoft Labs LLC. Licensed under Apache-2.0. -->
 
-# 🧠 Nessy AGI Capability Matrix
+# 🧠 Nessy AGI & Frontier Capability Matrix
 
-## Purpose
+## ◈ Purpose
 
-This matrix turns frontier-model and AGI research into executable platform capabilities. Every capability has a normalized contract, provider adapters, evaluation hooks, and a path into the autonomous runtime.
+Nessy converts frontier AI and AGI research into executable, composable platform capabilities. The capability graph is the common language between models, runtimes, tools, memory, research systems, execution environments, and autonomous workflows.
 
 ## Capability Domains
 
-| Domain | Capabilities |
-|---|---|
-| Reasoning | chain-of-thought execution, structured reasoning, verification, reflection, hypothesis generation, theorem proving |
-| Planning | decomposition, hierarchical planning, long-horizon planning, replanning, scheduling, dependency graphs |
-| Memory | working memory, episodic memory, semantic memory, procedural memory, persistent memory, retrieval, consolidation |
-| Learning | online adaptation, preference learning, self-evaluation, skill acquisition, curriculum generation, continual improvement |
-| Agents | tool use, delegation, parallel agents, agent teams, councils, role specialization, asynchronous tasks |
-| Computer Use | browser control, GUI interaction, terminal control, filesystem operations, IDE workflows, remote desktop |
-| Coding | code generation, repository understanding, refactoring, debugging, testing, benchmarking, worktree orchestration |
-| Research | web search, web fetch, source synthesis, literature analysis, experiment planning, citation graphs, evidence aggregation |
-| Multimodal | vision, OCR, image understanding, audio understanding, speech, video understanding, cross-modal reasoning |
-| Generation | text, code, image generation/editing, video generation/editing, audio generation/editing, document generation |
-| Interaction | realtime voice, streaming, structured output, function calling, MCP, connectors, notifications |
-| Scientific | symbolic math, numerical computation, simulation, data analysis, model discovery, experiment execution |
-| Security | code audit, dependency analysis, threat modeling, secret detection, policy evaluation, runtime telemetry |
-| Infrastructure | distributed scheduling, peer discovery, failover, checkpointing, replication, content addressing, workload migration |
-| Governance | provenance, attribution, licensing metadata, audit trails, reproducible builds, artifact signing |
+| Domain | Capability surface |
+|:--|:--|
+| **Reasoning** | structured reasoning, verification, reflection, hypothesis generation, theorem proving |
+| **Planning** | decomposition, hierarchical planning, long-horizon planning, replanning, scheduling, dependency graphs |
+| **Memory** | working, episodic, semantic, procedural, persistent memory, retrieval, consolidation |
+| **Learning** | online adaptation, preference learning, self-evaluation, skill acquisition, curriculum generation, continual improvement |
+| **Agents** | tool use, delegation, parallel agents, teams, councils, role specialization, asynchronous tasks |
+| **Computer Use** | browser, GUI, terminal, filesystem, IDE, remote desktop |
+| **Coding** | generation, repository understanding, refactoring, debugging, testing, benchmarking, worktree orchestration |
+| **Research** | search, fetch, synthesis, literature analysis, experiment planning, citation/evidence graphs |
+| **Multimodal** | vision, OCR, image, audio, speech, video, cross-modal reasoning |
+| **Generation** | text, code, image, video, audio, document generation and editing |
+| **Interaction** | realtime voice, streaming, structured output, function calling, MCP, connectors, notifications |
+| **Scientific** | symbolic math, numerical computation, simulation, data analysis, model discovery, experiments |
+| **Security** | code audit, dependency analysis, threat modeling, secret detection, policy evaluation, telemetry |
+| **Infrastructure** | distributed scheduling, peer discovery, failover, checkpointing, replication, content addressing, workload migration |
+| **Governance** | provenance, attribution, licensing metadata, audit trails, reproducible builds, artifact signing |
 
-## Frontier Provider Coverage
+## 🌐 Frontier Coverage
 
-Nessy maps provider features into the same capability vocabulary so the router can compose capabilities rather than hard-code a single model.
+Nessy maintains normalized capability coverage for the named frontier systems and expands the registry as additional systems are researched:
 
-- **Fable** — long-horizon reasoning, research, coding, agent workflows.
-- **Glasswing** — multimodal and interactive agent workflows.
-- **Qwen** — reasoning, multimodality, coding, tool use, structured interaction, agent workflows.
-- **Gemini** — multimodal reasoning, long context, search, code execution, agentic coding, structured interaction.
-- **Grok** — reasoning, search, coding, multimodal interaction, tool-oriented workflows.
-- **Seed** — long-horizon agent execution, research, coding, computer interaction.
-- **Seedance** — multimodal video generation, editing and transformation.
-- **Perplexity** — web research, persistent context, connectors, computer-oriented agents, asynchronous workflows.
-- **Z.ai / GLM** — reasoning, coding, tool use, multimodality and agent workflows.
-- **Gemma** — reasoning, multimodality, long context, function calling and deployable local inference.
+| System | Capability areas represented |
+|:--|:--|
+| **Fable** | long-horizon reasoning, research, coding, agent workflows |
+| **Glasswing** | multimodal and interactive agent workflows |
+| **Qwen** | reasoning, multimodality, coding, tools, structured interaction, agents |
+| **Gemini** | multimodal reasoning, long context, search, code execution, agentic coding, structured interaction |
+| **Grok** | reasoning, search, coding, multimodal interaction, tool workflows |
+| **Seed** | long-horizon agents, research, coding, computer interaction |
+| **Seedance** | multimodal video generation, editing, transformation |
+| **Perplexity** | web research, persistent context, connectors, computer agents, asynchronous workflows |
+| **Z.ai / GLM** | reasoning, coding, tools, multimodality, agent workflows |
+| **Gemma** | reasoning, multimodality, long context, function calling, deployable inference |
 
-## Runtime Composition
+## 🔭 Continuous Frontier Expansion
 
-```text
-RESEARCH
-   ↓
-CAPABILITY EXTRACTION
-   ↓
-NORMALIZED CONTRACT
-   ↓
-PROVIDER REGISTRY
-   ↓
-CAPABILITY GRAPH
-   ↓
-TASK DECOMPOSITION
-   ↓
-PARALLEL EXECUTION
-   ↓
-OBSERVATION / EVALUATION
-   ↓
-MEMORY CONSOLIDATION
-   ↓
-SKILL REGISTRATION
-   ↓
-CONTINUOUS DISCOVERY
-```
+The registry is intentionally broader than the initial named set. Research additions are normalized into the same contract vocabulary across:
 
-## Capability Contract
+**OpenAI · Anthropic · Meta · Mistral · DeepSeek · xAI · Google · Alibaba · ByteDance · Moonshot AI · Z.ai · Perplexity · AI21 · Cohere · NVIDIA · Microsoft · Amazon · IBM · Hugging Face · Stability AI · Runway · Luma · Black Forest Labs · ElevenLabs · Open-source and research models**
 
-Every capability implementation should expose:
+The provider registry is designed to add additional model families, agent frameworks, modalities, tools, memory systems, inference techniques, and research capabilities without changing the core orchestration model.
+
+## ⚙️ Capability Contract
+
+Each registered capability exposes:
 
 ```text
 identity
@@ -78,8 +62,8 @@ provider
 inputs
 outputs
 requirements
-cost model
-latency model
+quality
+latency
 health
 authorization
 telemetry
@@ -89,45 +73,100 @@ evaluation suite
 provenance
 ```
 
-## AGI Runtime Graph
+## 🧩 Composition
+
+```text
+                 TASK / GOAL
+                     │
+                     ▼
+              REQUIREMENTS GRAPH
+                     │
+                     ▼
+             CAPABILITY MATCHING
+                     │
+          ┌──────────┼──────────┐
+          ▼          ▼          ▼
+       PROVIDER    PROVIDER    PROVIDER
+          │          │          │
+          └──────────┼──────────┘
+                     ▼
+              COMPOSITE PLAN
+                     │
+                     ▼
+            PARALLEL / SERIAL RUN
+                     │
+                     ▼
+             OBSERVE / EVALUATE
+                     │
+                     ▼
+             MEMORY / SKILL STORE
+                     │
+                     └──────────► NEXT TASK
+```
+
+## 🧠 AGI Runtime Graph
 
 ```text
                     ┌───────────────┐
                     │ WORLD / INPUT │
                     └───────┬───────┘
-                            ↓
+                            ▼
                     ┌───────────────┐
                     │ PERCEPTION    │
                     └───────┬───────┘
-                            ↓
+                            ▼
               ┌─────────────┴─────────────┐
-              ↓                           ↓
-         MEMORY GRAPH                 KNOWLEDGE
+              ▼                           ▼
+        MEMORY GRAPH                 KNOWLEDGE GRAPH
               │                           │
               └─────────────┬─────────────┘
-                            ↓
+                            ▼
                     ┌───────────────┐
                     │ REASON / PLAN │
                     └───────┬───────┘
-                            ↓
+                            ▼
                     ┌───────────────┐
                     │ ACT / DELEGATE│
                     └───────┬───────┘
-                            ↓
+                            ▼
                     ┌───────────────┐
                     │ OBSERVE RESULT│
                     └───────┬───────┘
-                            ↓
+                            ▼
                     ┌───────────────┐
                     │ EVALUATE      │
                     └───────┬───────┘
-                            ↓
+                            ▼
                     ┌───────────────┐
                     │ LEARN / STORE │
                     └───────┬───────┘
-                            └──────────────► NEXT CYCLE
+                            └──────────────► CONTINUOUS DISCOVERY
 ```
 
-## Implementation Rule
+## 🔬 Research-to-Runtime Pipeline
 
-A newly discovered frontier capability becomes a first-class Nessy capability when its contract, adapter, evaluation, telemetry, persistence behavior, and composition semantics are implemented. The capability registry is therefore an expanding runtime graph rather than a static model list.
+```text
+RESEARCH
+   ↓
+EXTRACT FEATURE / FUNCTION
+   ↓
+DEFINE NORMALIZED CAPABILITY
+   ↓
+IMPLEMENT ADAPTER
+   ↓
+ADD EVALUATION
+   ↓
+ADD TELEMETRY
+   ↓
+ADD PERSISTENCE / RECOVERY
+   ↓
+REGISTER IN CAPABILITY GRAPH
+   ↓
+COMPOSE WITH EXISTING CAPABILITIES
+   ↓
+DEPLOY THROUGH AUTONOMOUS RUNTIME
+```
+
+## ✦ Source of Truth
+
+The executable capability graph lives in `crates/capability/src/agi.rs`. This document describes its capability vocabulary and frontier coverage. New research should update both the registry and this matrix so documentation and implementation remain synchronized.
