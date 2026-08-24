@@ -1,7 +1,9 @@
-// Copyright 2026 Synthicsoft Labs LLC
+// Copyright 2026 Adam Joseph Rivers, CEO, Synthicsoft Labs LLC
 // Licensed under the Apache License, Version 2.0.
 
+pub mod agi;
 pub mod frontier;
+pub mod runtime;
 
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -25,6 +27,25 @@ pub enum Capability {
     PeerMesh,
     LocalRuntime,
     RemoteRuntime,
+    SemanticRetrieval,
+    HierarchicalMemory,
+    SkillChains,
+    ParallelExecution,
+    AgentSpawn,
+    DynamicExtensions,
+    CloudInference,
+    CapabilityRouting,
+    WebResearch,
+    ComputerUse,
+    Vision,
+    Audio,
+    Video,
+    RealtimeInteraction,
+    SelfEvaluation,
+    ContinualLearning,
+    ExperimentExecution,
+    Provenance,
+    Audit,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
