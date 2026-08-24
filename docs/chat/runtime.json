@@ -1,17 +1,26 @@
 {
-  "version": 1,
+  "version": 2,
   "project": "BowserAI/Nessy",
   "discovery": {
     "strategy": "automatic",
     "configuration": "repository",
-    "manual_endpoint_required": false
+    "manual_endpoint_required": false,
+    "failover": "priority_then_fallback"
   },
   "runtimes": [
     {
       "name": "kairos",
       "base": "https://the-real-kairos.com",
       "chat_paths": ["/api/chat", "/chat/api", "/api/v1/chat", "/v1/chat"],
+      "method": "POST",
       "priority": 100
+    },
+    {
+      "name": "community-text",
+      "base": "https://text.pollinations.ai/",
+      "chat_paths": [""],
+      "method": "GET",
+      "priority": 10
     }
   ],
   "capabilities": [
