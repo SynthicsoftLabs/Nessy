@@ -1,0 +1,36 @@
+# Copyright 2026 Synthicsoft Labs LLC
+# Licensed under the Apache License, Version 2.0.
+name: Integrity
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    name: Independent integrity verification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify exact commit
+        run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - name: Verify repository state
+        run: git diff --exit-code
+      - name: Verify no merge markers
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -RInE '^(<<<<<<<|=======|>>>>>>>)' --exclude-dir=.git .
+      - name: Verify Rust metadata
+        run: cargo metadata --locked --format-version 1 > /dev/null
+      - name: Verify formatting
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - run: cargo fmt --all -- --check
