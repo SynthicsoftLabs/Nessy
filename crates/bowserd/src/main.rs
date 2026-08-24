@@ -2,8 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 use std::sync::Arc;
-use tokio::signal;
-use tracing::{info, warn};
+use tracing::info;
 use turtle::Scheduler;
 
 #[tokio::main]
@@ -14,10 +13,29 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .init();
 
     let scheduler = Arc::new(Scheduler::default());
-    info!("bowserd started");
+    let kairos = kairos::KairosClient::from_environment()?;
+    info!(kairos_endpoint = kairos.base_url(), "autonomous runtime initialized");
 
-    signal::ctrl_c().await?;
-    warn!("shutdown signal received; beginning graceful drain");
+    let runtime = capability::RuntimeDescriptor {
+        id: uuid::Uuid::new_v4(),
+        name: "kairos".into(),
+        capabilities: [
+            capability::Capability::Inference,
+            capability::Capability::RemoteRuntime,
+            capability::Capability::PeerMesh,
+        ]
+        .into_iter()
+        .collect(),
+        endpoint: Some(kairos.base_url().to_owned()),
+        priority: 100,
+        healthy: true,
+    };
+
+    info!(runtime = %runtime.name, fingerprint = %runtime.fingerprint(), "runtime registered");
+    info!(queued_tasks = 0, "bowserd ready for autonomous scheduling");
+
+    tokio::signal::ctrl_c().await?;
+    info!("shutdown signal received; beginning graceful drain");
     drop(scheduler);
     info!("bowserd stopped");
     Ok(())
