@@ -9,6 +9,8 @@ members = [
   "crates/bowserd",
   "crates/mcp",
   "crates/kairos",
+  "crates/capability",
+  "crates/inference",
 ]
 
 [workspace.package]
@@ -29,3 +31,4 @@ tokio = { version = "1.47", features = ["macros", "rt-multi-thread", "signal", "
 uuid = { version = "1.18", features = ["v4", "serde"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "json"] }
+sha2 = "0.10"
