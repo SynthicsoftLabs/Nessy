@@ -1,5 +1,5 @@
 // Copyright 2026 Synthicsoft Labs LLC
-// Licensed under the Apache License, Version 2.0 and the MIT License.
+// Licensed under the Apache License, Version 2.0.
 
 use std::sync::Arc;
 use tokio::signal;
