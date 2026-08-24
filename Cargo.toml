@@ -1,5 +1,5 @@
 # Copyright 2026 Synthicsoft Labs LLC
-# Licensed under Apache-2.0 OR MIT.
+# Licensed under the Apache License, Version 2.0.
 [workspace]
 resolver = "2"
 members = [
@@ -12,7 +12,7 @@ members = [
 
 [workspace.package]
 edition = "2024"
-license = "Apache-2.0 OR MIT"
+license = "Apache-2.0"
 version = "0.1.0"
 authors = ["Synthicsoft Labs LLC"]
 repository = "https://github.com/SynthicsoftLabs/Nessy"
