@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "project": "BowserAI/Nessy",
+  "discovery": {
+    "strategy": "automatic",
+    "configuration": "repository",
+    "manual_endpoint_required": false
+  },
+  "runtimes": [
+    {
+      "name": "kairos",
+      "base": "https://the-real-kairos.com",
+      "chat_paths": ["/api/chat", "/chat/api", "/api/v1/chat", "/v1/chat"],
+      "priority": 100
+    }
+  ],
+  "capabilities": [
+    "reasoning",
+    "planning",
+    "memory",
+    "research",
+    "tools",
+    "coding",
+    "multimodal",
+    "self_evaluation",
+    "capability_routing",
+    "continuous_learning"
+  ],
+  "session": {
+    "client_persistence": "sessionStorage",
+    "server_session": true
+  }
+}
