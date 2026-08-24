@@ -1,6 +1,6 @@
 <!--
 Copyright 2026 Synthicsoft Labs LLC
-Licensed under the Apache License, Version 2.0; and MIT License.
+Licensed under the Apache License, Version 2.0.
 See LICENSE for the Apache License text and project notices.
 -->
 # 🐢 BowserAI / Nessy
@@ -17,7 +17,7 @@ Nessy/
 │   ├── bowser-core/       # shared domain types and errors
 │   ├── turtle/            # orchestration/session state
 │   ├── koopa/             # execution/sandbox abstractions
-│   └── bowserd/           # executable daemon
+│   └── bowserd/            # executable daemon
 ├── docs/
 ├── .github/workflows/
 └── Cargo.toml
@@ -45,4 +45,4 @@ just clippy
 
 ## License
 
-BowserAI/Nessy is released under the project's dual Apache-2.0/MIT licensing arrangement. See `LICENSE` and `NOTICE` for details.
+BowserAI/Nessy is released under the Apache License, Version 2.0. See `LICENSE` and `NOTICE` for details.
