@@ -39,7 +39,10 @@ impl MemoryHierarchy {
     }
 
     pub fn by_tier(&self, tier: MemoryTier) -> Vec<&MemoryRecord> {
-        self.records.values().filter(|record| record.tier == tier).collect()
+        self.records
+            .values()
+            .filter(|record| record.tier == tier)
+            .collect()
     }
 }
 
@@ -65,7 +68,11 @@ impl SkillChain {
         if self.steps.is_empty() {
             return Err("skill chain requires at least one step");
         }
-        if self.steps.iter().any(|step| step.capability.trim().is_empty()) {
+        if self
+            .steps
+            .iter()
+            .any(|step| step.capability.trim().is_empty())
+        {
             return Err("every skill step requires a capability");
         }
         Ok(())
@@ -93,7 +100,11 @@ impl ParallelBatch {
         if self.concurrency == 0 {
             return Err("parallel concurrency must be positive");
         }
-        if self.calls.iter().any(|call| call.capability.trim().is_empty()) {
+        if self
+            .calls
+            .iter()
+            .any(|call| call.capability.trim().is_empty())
+        {
             return Err("every parallel call requires a capability");
         }
         Ok(())
@@ -168,9 +179,24 @@ mod tests {
     fn provider_registry_selects_best_healthy_route() {
         let registry = ProviderRegistry {
             routes: vec![
-                ProviderRoute { provider: "a".into(), capability: "reasoning".into(), priority: 10, healthy: true },
-                ProviderRoute { provider: "b".into(), capability: "reasoning".into(), priority: 20, healthy: true },
-                ProviderRoute { provider: "c".into(), capability: "reasoning".into(), priority: 100, healthy: false },
+                ProviderRoute {
+                    provider: "a".into(),
+                    capability: "reasoning".into(),
+                    priority: 10,
+                    healthy: true,
+                },
+                ProviderRoute {
+                    provider: "b".into(),
+                    capability: "reasoning".into(),
+                    priority: 20,
+                    healthy: true,
+                },
+                ProviderRoute {
+                    provider: "c".into(),
+                    capability: "reasoning".into(),
+                    priority: 100,
+                    healthy: false,
+                },
             ],
         };
         assert_eq!(registry.best("reasoning").unwrap().provider, "b");
