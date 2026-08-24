@@ -1,6 +1,6 @@
 <!--
 Copyright 2026 Synthicsoft Labs LLC
-Licensed under the Apache License, Version 2.0; and MIT License.
+Licensed under the Apache License, Version 2.0.
 -->
 # BowserAI Architecture
 
