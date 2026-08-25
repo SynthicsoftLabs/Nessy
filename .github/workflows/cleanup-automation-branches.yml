@@ -1,0 +1,51 @@
+# Copyright 2026 Adam Joseph Rivers, CEO, Synthicsoft Labs LLC.
+# Licensed under the Apache License, Version 2.0.
+name: Nessy Automation Branch Cleanup
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  GH_REPO: ${{ github.repository }}
+
+concurrency:
+  group: nessy-automation-branch-cleanup
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    name: Remove stale automation branches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Remove stale automation branches
+        shell: bash
+        run: |
+          set -euo pipefail
+          protected_branch='automation/nessy-autonomous'
+          mapfile -t open_heads < <(
+            gh pr list --repo "$GH_REPO" --state open --limit 100 --json headRefName --jq '.[].headRefName'
+          )
+          for branch in $(gh api --paginate "/repos/$GH_REPO/branches?per_page=100" --jq '.[].name' | grep '^automation/' || true); do
+            [[ "$branch" == "$protected_branch" ]] && continue
+            keep=0
+            for head in "${open_heads[@]}"; do
+              [[ "$head" == "$branch" ]] && keep=1 && break
+            done
+            [[ "$keep" -eq 1 ]] && continue
+            gh api --method DELETE "/repos/$GH_REPO/git/refs/heads/$branch"
+            echo "Deleted stale automation branch: $branch"
+          done
