@@ -1,6 +1,6 @@
-# Copyright 2026 Synthicsoft Labs LLC
+# Copyright 2026 Adam Joseph Rivers, CEO, Synthicsoft Labs LLC.
 # Licensed under the Apache License, Version 2.0.
-name: Deploy Nessy Chat
+name: Nessy Chat Artifact
 
 on:
   push:
@@ -12,30 +12,55 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: nessy-chat-artifact
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  publish:
+    name: Build and publish repository chat artifact
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
+        uses: actions/checkout@v5
         with:
-          enablement: true
-      - name: Upload site
-        uses: actions/upload-pages-artifact@v3
+          fetch-depth: 1
+
+      - name: Verify exact source revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+
+      - name: Validate chat surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s docs/chat/index.html
+          test -s docs/chat/runtime.json
+          grep -q '<html' docs/chat/index.html
+          grep -q 'Nessy' docs/chat/index.html
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('docs/chat/runtime.json').read_text())
+          assert isinstance(data, dict)
+          assert isinstance(data.get('runtimes'), list)
+          PY
+
+      - name: Package chat surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cp -a docs/chat/. dist/
+          printf '%s\n' "$GITHUB_SHA" > dist/SOURCE_SHA
+
+      - name: Publish chat artifact
+        uses: actions/upload-artifact@v4
         with:
-          path: ./docs/chat
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
+          name: nessy-chat-${{ github.sha }}
+          path: dist
+          if-no-files-found: error
+          retention-days: 90
