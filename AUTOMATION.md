@@ -23,9 +23,15 @@ The workflow uses GitHub Copilot CLI in non-interactive mode through the reposit
 
 ## Failure-driven operation
 
-A completed workflow failure automatically becomes an engineering input. The autonomous engineer retrieves the failing run context, reads the affected source and test surface, reproduces the failure, repairs the root cause, reruns the complete validation matrix, and promotes the verified result.
+A completed workflow result automatically becomes an engineering input. The autonomous engineer retrieves the run context, reads the affected source and test surface, reproduces any failure, repairs the root cause, reruns the complete validation matrix, and promotes the verified result.
 
-The same engine also runs on pull-request updates and on a recurring schedule so repository drift, stale documentation, latent test failures, and integration defects are continuously discovered rather than waiting for a maintainer to notice them.
+The same engine also runs on pull-request updates, on pushes to automation branches, and on a recurring schedule so repository drift, stale documentation, latent test failures, and integration defects are continuously discovered rather than waiting for a maintainer to notice them.
+
+## Autonomous execution verification
+
+Every autonomous cycle is itself observable. The triggering event, target SHA, working branch, pull-request state, validation result, promotion result, and post-merge target SHA are written into the GitHub Actions step summary. A cycle is considered complete only after the promoted `main` commit has been independently re-read and repository integrity succeeds against that exact commit.
+
+A fresh same-repository pull request or automation-branch push is therefore a complete machine-generated verification trigger: the autonomous engineer must inspect the repository, perform the engineering cycle, update the pull request as required, wait for the validation matrix, promote the result, and verify the resulting `main` state without requesting operator input.
 
 ## Git contract
 
