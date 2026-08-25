@@ -28,14 +28,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          expected="${GITHUB_SHA}"
-          actual="$(git rev-parse HEAD)"
-          test "$expected" = "$actual"
+          test "${GITHUB_SHA}" = "$(git rev-parse HEAD)"
       - name: Detect unresolved markers
         shell: bash
         run: |
           set -euo pipefail
-          if grep -RInE '^(<<<<<<<|=======|>>>>>>>)' --exclude-dir=.git .; then exit 1; fi
+          ! grep -RInE '^(<<<<<<<|=======|>>>>>>>)' --exclude-dir=.git .
       - name: Verify dependency metadata
         run: cargo metadata --format-version 1 > /dev/null
 
@@ -95,13 +93,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
       - name: Assert Apache-2.0-only project licensing
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'license.workspace = true' crates/bowserd/Cargo.toml
-          grep -q '^license = "Apache-2.0"' Cargo.toml
-          if grep -RInE 'Apache-2.0 OR MIT|Apache License, Version 2.0; and MIT|dual Apache|Apache-2.0/MIT|and/or the MIT License' --exclude-dir=.git --exclude='ci.yml' --exclude='integrity.yml' --exclude='verify-repository.sh' --exclude='justfile' --exclude='LICENSE' .; then exit 1; fi
+          test "$(grep -c '^license = \"Apache-2.0\"$' Cargo.toml)" -eq 1
+          cargo metadata --no-deps --format-version 1 > /tmp/nessy-metadata.json
+          python3 - <<'PY'
+          import json
+          with open('/tmp/nessy-metadata.json', encoding='utf-8') as f:
+              data = json.load(f)
+          packages = data.get('packages', [])
+          assert packages, 'workspace metadata contains no packages'
+          bad = [(p['name'], p.get('license')) for p in packages if p.get('license') != 'Apache-2.0']
+          assert not bad, f'non-Apache project package licenses: {bad}'
+          PY
 
   sbom:
     name: SBOM
