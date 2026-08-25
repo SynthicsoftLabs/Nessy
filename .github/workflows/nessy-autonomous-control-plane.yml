@@ -110,22 +110,20 @@ jobs:
           OBJECTIVE: ${{ steps.context.outputs.objective }}
         run: |
           set -euo pipefail
-          args=(--repo "$GH_REPO" --ref "$TARGET_REF" -f objective="$OBJECTIVE")
-          if [ -n "$ISSUE_NUMBER" ]; then
-            args+=( -f issue_number="$ISSUE_NUMBER" )
-          fi
-          gh workflow run nessy-autonomous-engineer.yml "${args[@]}"
+          gh workflow run nessy-autonomous-engineer.yml \
+            --repo "$GH_REPO" \
+            --ref main \
+            -f target_ref="$TARGET_REF" \
+            -f objective="$OBJECTIVE" \
+            -f issue_number="$ISSUE_NUMBER"
 
       - name: Verify dispatch
         shell: bash
-        env:
-          TARGET_REF: ${{ steps.context.outputs.target_ref }}
         run: |
           set -euo pipefail
           for attempt in $(seq 1 20); do
-            run_id=$(gh run list --repo "$GH_REPO" --workflow nessy-autonomous-engineer.yml --event workflow_dispatch --limit 20 --json databaseId,headBranch,status --jq --arg ref "$TARGET_REF" '[.[] | select(.headBranch == $ref)] | .[0].databaseId // empty')
+            run_id=$(gh run list --repo "$GH_REPO" --workflow nessy-autonomous-engineer.yml --event workflow_dispatch --limit 20 --json databaseId,headBranch,status --jq '.[] | select(.headBranch == "main") | .databaseId' | head -n1)
             if [ -n "$run_id" ]; then
-              echo "worker_run_id=$run_id" >> "$GITHUB_OUTPUT" 2>/dev/null || true
               echo "Worker run: $run_id" >> "$GITHUB_STEP_SUMMARY"
               exit 0
             fi
