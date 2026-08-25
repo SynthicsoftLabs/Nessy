@@ -1,0 +1,42 @@
+# Copyright 2026 Synthicsoft Labs LLC
+# Licensed under the Apache License, Version 2.0.
+name: Interposition Integrity
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify immutable repository state
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact event commit
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+      - name: Install verification runtime
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+      - name: Verify repository state and remote ref
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bash scripts/verify-interposition.sh
+      - name: Verify critical workflow hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in .github/workflows/ci.yml .github/workflows/integrity.yml .github/workflows/pages.yml .github/workflows/interposition.yml; do
+            test -f "$f"
+            git cat-file -e "HEAD:$f"
+            test "$(git rev-parse HEAD:$f)" = "$(git hash-object "$f")"
+          done
