@@ -27,6 +27,12 @@ A completed workflow failure automatically becomes an engineering input. The aut
 
 The same engine also runs on pull-request updates and on a recurring schedule so repository drift, stale documentation, latent test failures, and integration defects are continuously discovered rather than waiting for a maintainer to notice them.
 
+## Autonomous execution verification
+
+Every autonomous cycle is itself observable. The triggering event, target SHA, working branch, pull-request state, validation result, promotion result, and post-merge target SHA are written into the GitHub Actions step summary. A cycle is considered complete only after the promoted `main` commit has been independently re-read and repository integrity succeeds against that exact commit.
+
+A fresh same-repository pull request is therefore a complete machine-generated verification trigger: the autonomous engineer must inspect the repository, perform the engineering cycle, update the pull request as required, wait for the validation matrix, promote the result, and verify the resulting `main` state without requesting operator input.
+
 ## Git contract
 
 `main` is never the working branch for an autonomous change. Repairs are committed on an isolated automation branch and promoted through a pull request. Logical work remains atomic and uses Conventional Commit messages.
