@@ -14,11 +14,11 @@
 [![Rust](https://img.shields.io/badge/Rust-2024-111827?style=for-the-badge&logo=rust)](https://www.rust-lang.org/)
 [![Repository](https://img.shields.io/badge/GitHub-SynthicsoftLabs%2FNessy-111827?style=for-the-badge&logo=github)](https://github.com/SynthicsoftLabs/Nessy)
 
-**Nessy is the engineering foundation of BowserAI:** an autonomous intelligence fabric coordinating AGI capabilities, frontier model providers, runtimes, inference, execution, identity, durable state, MCP tools, research, learning, and distributed infrastructure through one coherent system.
+**Nessy is the engineering foundation of BowserAI:** an autonomous intelligence fabric coordinating capability composition, model providers, runtimes, inference, execution, identity, durable state, MCP tools, research, learning, observability, and repository-native autonomous engineering.
 
-### 💬 [**CHAT WITH NESSY**](https://html-preview.github.io/?url=https://github.com/SynthicsoftLabs/Nessy/blob/0dc57436e0f5d8198ca4a2f919efae7f3eb75a01/docs/chat/index.html)
+### 💬 [**CHAT WITH NESSY**](https://html-preview.github.io/?url=https://github.com/SynthicsoftLabs/Nessy/blob/main/docs/chat/index.html)
 
-**Open the version-pinned live BowserAI interface directly from this repository.**
+**Open the repository-native BowserAI interface directly from this repository.**
 
 </div>
 
@@ -26,126 +26,81 @@
 
 > **Attribution:** BowserAI / Nessy was created by **Adam Joseph Rivers, CEO of Synthicsoft Labs LLC**. Redistribution is governed by the Apache License, Version 2.0 and its applicable copyright, attribution, NOTICE, and trademark provisions. See [`NOTICE`](NOTICE) and [`LICENSE`](LICENSE).
 
----
+## ◈ What Nessy Is
 
-## ◈ Live Intelligence Interface
+Nessy is organized around an executable capability fabric rather than a single model. A task can be decomposed across reasoning, planning, memory, research, coding, multimodal perception, tools, execution, and evaluation capabilities, then routed across compatible model providers and runtimes.
 
-The repository ships its browser-native Nessy interface at [`docs/chat/index.html`](docs/chat/index.html). The README chat button uses a repository HTML renderer and pins the preview to a verified repository commit so source and controller assets resolve from the same immutable revision.
+GitHub is the public project/control substrate. Kairos provides always-on runtime integration. Turtle coordinates work. Koopa supplies execution backends. MCP exposes tools. Storage preserves durable state. Identity establishes agent identity. Inference normalizes provider access. The autonomous control plane owns repository engineering.
 
-```text
-GitHub Repository
-       │
-       ▼
-   README.md
-       │
-       ▼
-  CHAT WITH NESSY
-       │
-       ▼
-Repository HTML Renderer
-       │
-       ▼
-  BowserAI Chat UI
-       │
-       ▼
-  app.js controller
-       │
-       ├── Kairos / Chat API
-       ├── Pollinations
-       └── Browser inference
-```
+## 💬 Repository Chat
 
-The chat surface is versioned directly in this repository with its executable controller at [`docs/chat/app.js`](docs/chat/app.js), runtime configuration at [`docs/chat/runtime.json`](docs/chat/runtime.json), persistent browser history, keyboard-friendly composition, and automatic runtime failover.
+The repository ships a browser-native chat interface at [`docs/chat/index.html`](docs/chat/index.html) with its executable controller at [`docs/chat/app.js`](docs/chat/app.js).
 
-## ◈ System Fabric
+The interface includes:
+
+- persistent conversation storage until explicitly cleared;
+- conversation search, pinning, import/export, copy/share, regeneration, and new-chat controls;
+- modes for automatic, research, creative, code, and fast workflows;
+- runtime/provider selection and automatic routing;
+- browser inference fallback with multiple browser-compatible models;
+- runtime diagnostics and response-source reporting;
+- long-running session history with context selection rather than destructive history deletion;
+- keyboard-first composition and responsive desktop/mobile presentation.
+
+Runtime routing is defined in [`docs/chat/runtime.json`](docs/chat/runtime.json). Free/open model and provider discovery is defined in [`docs/models/free-models.json`](docs/models/free-models.json).
 
 ```text
-                              ┌─────────────────────────┐
-                              │        BOWSERAI         │
-                              │   AUTONOMOUS INTELLIGENCE│
-                              │          FABRIC          │
-                              └────────────┬────────────┘
-                                           │
-                              ┌────────────▼────────────┐
-                              │   AGI CAPABILITY GRAPH  │
-                              │ reason · plan · remember│
-                              │ learn · research · act  │
-                              └────────────┬────────────┘
-                                           │
-              ┌────────────────────────────┼────────────────────────────┐
-              ▼                            ▼                            ▼
-        ┌────────────┐              ┌────────────┐              ┌────────────┐
-        │   KAIROS   │              │   TURTLE   │              │ INFERENCE  │
-        │  ALWAYS-ON │              │ORCHESTRATOR│              │ PROVIDERS  │
-        └─────┬──────┘              └──────┬─────┘              └─────┬──────┘
-              │                            │                            │
-              └────────────────────────────┼────────────────────────────┘
-                                           ▼
-        ┌────────────┬────────────┬────────────┬────────────┬────────────┐
-        │   KOOPA    │    MCP     │  STORAGE   │  IDENTITY  │   GITHUB   │
-        │  EXECUTE   │   TOOLS    │ DURABLE CAS│  AGENTS    │  BACKEND   │
-        └────────────┴────────────┴────────────┴────────────┴────────────┘
-                                           │
-                                           ▼
-                               OBSERVE → EVALUATE → LEARN
-                                           │
-                                           └──────► DISCOVER
+README
+  ↓
+CHAT WITH NESSY
+  ↓
+Repository HTML renderer
+  ↓
+BowserAI Chat UI
+  ↓
+app.js controller
+  ↓
+Provider/runtime routing
+  ├─ Kairos
+  ├─ cloud/API providers
+  ├─ routers
+  └─ browser inference
+  ↓
+Persistent conversation state
 ```
 
 ## 🧠 AGI Capability Fabric
 
-Nessy now models AGI capabilities as executable, composable runtime contracts rather than a static model list. The capability graph spans:
+Nessy models AGI functionality as composable runtime contracts.
 
-| Domain | Fabric |
+| Domain | Capability surface |
 |:--|:--|
 | **Reasoning** | structured reasoning, verification, reflection, hypotheses, theorem proving |
 | **Planning** | decomposition, hierarchy, long-horizon plans, replanning, scheduling |
 | **Memory** | working, episodic, semantic, procedural, persistent memory, retrieval, consolidation |
-| **Learning** | online adaptation, preference learning, self-evaluation, skill acquisition, continual improvement |
+| **Learning** | adaptation, preference learning, self-evaluation, skill acquisition, continual improvement |
 | **Agents** | tools, delegation, parallel agents, councils, specialization, asynchronous tasks |
 | **Computer use** | browser, GUI, terminal, filesystem, IDE, remote desktop |
-| **Coding** | generation, repository understanding, refactoring, debugging, testing, benchmarking, worktrees |
+| **Coding** | generation, repository understanding, refactoring, debugging, testing, benchmarking |
 | **Research** | search, fetch, synthesis, literature analysis, experiments, evidence aggregation |
 | **Multimodal** | vision, OCR, audio, speech, video, cross-modal reasoning |
 | **Generation** | text, code, image, video, audio, document generation/editing |
-| **Scientific** | symbolic math, numerical computation, simulation, data analysis, discovery |
+| **Scientific** | symbolic math, numerical computation, simulation, data analysis, experiments |
 | **Security** | code audit, dependency analysis, threat modeling, secret detection, telemetry |
-| **Infrastructure** | scheduling, peer discovery, failover, checkpointing, replication, workload migration |
-| **Governance** | provenance, attribution, licensing metadata, audit trails, reproducible artifacts |
+| **Infrastructure** | scheduling, peer discovery, failover, checkpointing, replication, migration |
+| **Governance** | provenance, attribution, licensing metadata, audit trails, reproducibility |
 
-See [`docs/AGI_CAPABILITY_MATRIX.md`](docs/AGI_CAPABILITY_MATRIX.md) and `crates/capability/src/agi.rs`.
+See [`docs/AGI_CAPABILITY_MATRIX.md`](docs/AGI_CAPABILITY_MATRIX.md) for the normalized capability vocabulary and frontier-provider coverage.
 
-## 🌐 Frontier Model Fabric
+## 🌐 Frontier + Free Model Fabric
 
-Nessy normalizes frontier capabilities across providers into the same capability graph. Current research coverage includes:
+Nessy separates capability normalization from individual models and providers. Current frontier research coverage includes **Fable, Glasswing, Qwen, Gemini, Grok, Seed, Seedance, Perplexity, Z.ai / GLM, and Gemma**, with expansion to additional systems through the same capability contract.
 
-**Fable · Glasswing · Qwen · Gemini · Grok · Seed · Seedance · Perplexity · Z.ai / GLM · Gemma**
+The free/open registry incorporates model and provider discovery from the public [`12britz/awesome-free-models`](https://github.com/12britz/awesome-free-models) project, including open-weight models, free API providers, routers, local runtimes, multimodal systems, coding models, embeddings, RAG, agent frameworks, MCP tooling, evaluation/observability, and hosting resources. The upstream catalog states that its links were re-verified August 22, 2026 and includes explicit notes for services with changing or restricted access. citeturn219762view4
 
-The provider layer is extensible so additional models and systems become capability providers without redesigning the orchestration layer.
+Nessy records these as machine-readable discovery metadata. A catalog entry does not by itself mean that a provider is browser-callable, permanently free, or credential-free.
 
-```text
-FRONTIER RESEARCH
-       ↓
-CAPABILITY EXTRACTION
-       ↓
-NORMALIZED CONTRACT
-       ↓
-PROVIDER REGISTRY
-       ↓
-CAPABILITY GRAPH
-       ↓
-TASK DECOMPOSITION
-       ↓
-PARALLEL EXECUTION
-       ↓
-OBSERVE / EVALUATE
-       ↓
-MEMORY / SKILL REGISTRATION
-       ↓
-CONTINUOUS DISCOVERY
-```
-
-## ⚡ Autonomous Runtime
+## ⚡ Autonomous Runtime Fabric
 
 ```text
 DISCOVER → REGISTER → MATCH → COMPOSE → ROUTE → EXECUTE
@@ -154,34 +109,76 @@ DISCOVER → REGISTER → MATCH → COMPOSE → ROUTE → EXECUTE
     └──── RECOVER ← CHECKPOINT ← EVALUATE ← OBSERVE
 ```
 
-GitHub is the public project/control substrate. Kairos provides always-on runtime integration. Turtle coordinates execution. Koopa supplies execution backends. MCP exposes tools. Storage preserves durable state. Identity establishes agent identity. Inference connects model providers.
-
-## ◇ Core Fabric
+### Core runtime layers
 
 | Layer | Role | Crate |
 |:--|:--|:--|
-| **Bowser Core** | Shared domain contracts | `bowser-core` |
-| **Turtle** | Scheduling, state, recovery | `turtle` |
-| **Koopa** | Execution backends | `koopa` |
-| **Kairos** | Always-on runtime | `kairos` |
-| **Capability** | Runtime + AGI capability graph | `capability` |
-| **Inference** | Provider routing | `inference` |
-| **Storage** | Durable content-addressed state | `storage` |
-| **Identity** | Autonomous agent identity | `identity` |
-| **MCP** | Tool protocol | `mcp` |
+| **Bowser Core** | shared domain contracts | `bowser-core` |
+| **Turtle** | scheduling, task state, recovery, distributed coordination | `turtle` |
+| **Koopa** | execution backends | `koopa` |
+| **Kairos** | always-on runtime integration | `kairos` |
+| **Capability** | AGI/runtime capability graph | `capability` |
+| **Inference** | model/provider routing | `inference` |
+| **Storage** | durable content-addressed state | `storage` |
+| **Identity** | autonomous identity and credentials | `identity` |
+| **MCP** | model tool protocol | `mcp` |
 | **GitHub Backend** | GitHub-backed project/control state | `github-backend` |
-| **Bowserd** | Persistent daemon | `bowserd` |
+| **Bowserd** | persistent daemon | `bowserd` |
 
-## 🚀 Build
+## 🤖 Repository-Native Autonomous Engineering
 
-```bash
-cargo check --workspace
-cargo test --workspace
-cargo fmt --all -- --check
-cargo clippy --workspace --all-targets --all-features -- -D warnings
+The repository itself is the engineering control plane. The canonical flow is:
+
+```text
+GitHub event
+   ↓
+Nessy Autonomous Control Plane
+   ↓
+Nessy Autonomous Engineer
+   ↓
+Read lineage / README / affected files / blame / dependency graph
+   ↓
+Reproduce
+   ↓
+Regression coverage
+   ↓
+Root-cause repair
+   ↓
+Full validation matrix
+   ↓
+Atomic Conventional Commit
+   ↓
+Automation branch + PR
+   ↓
+Automated promotion
+   ↓
+Post-merge verification
 ```
 
-Autonomous bootstrap is provided by `scripts/bootstrap.sh`.
+The control plane responds to pushes, pull requests, issues, workflow completions, scheduled health cycles, and machine dispatch. The worker performs diagnosis, implementation, testing, validation, and promotion without requesting operator input during a normal cycle.
+
+Repository automation also owns failure recovery: a failed gate is an engineering input, not a reason to silently mark the run successful.
+
+See [`AUTOMATION.md`](AUTOMATION.md), [`docs/README.md`](docs/README.md), and the workflows under `.github/workflows/`.
+
+## 🛡️ Security + Integrity
+
+Nessy treats identity, authority, execution, state, network access, tool dispatch, artifact integrity, and auditability as explicit machine-readable concerns. Repository validation includes formatting, compilation, tests, Clippy, dependency audit, cargo-deny policy, project-license assertion, SBOM generation, repository integrity, and interposition checks.
+
+See [`SECURITY.md`](SECURITY.md).
+
+## 🚀 Build and validate
+
+```bash
+cargo fmt --all -- --check
+cargo check --workspace --all-targets
+cargo test --workspace --all-targets
+cargo clippy --workspace --all-targets --all-features -- -D warnings
+cargo audit
+cargo deny check
+```
+
+Autonomous bootstrap is available through `scripts/bootstrap.sh`.
 
 ## 🧭 Repository Map
 
@@ -201,29 +198,36 @@ Autonomous bootstrap is provided by `scripts/bootstrap.sh`.
 │   └── bowserd/          daemon
 ├── docs/
 │   ├── chat/             repository-native chat UI + controller
+│   ├── models/           free/open model registry
 │   ├── AGI_CAPABILITY_MATRIX.md
-│   └── ...
-├── scripts/              autonomous tooling
-├── .github/              repository automation
-├── ARCHITECTURE.md       system topology
-├── AUTOMATION.md         autonomous engineering contract
-├── SECURITY.md           security architecture
-├── NOTICE                creator attribution
-└── LICENSE               Apache License 2.0
+│   ├── DOCUMENTATION_COVERAGE.md
+│   └── README.md
+├── scripts/              autonomous tooling and integrity checks
+├── .github/workflows/    CI, security, integrity, deployment, autonomy
+├── ARCHITECTURE.md
+├── AUTOMATION.md
+├── SECURITY.md
+├── CONTRIBUTING.md
+├── NOTICE
+└── LICENSE
 ```
 
 ## 📚 Documentation
 
 | Document | Purpose |
 |:--|:--|
-| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Full system topology and runtime fabric |
-| [`docs/chat/index.html`](docs/chat/index.html) | Browser chat interface |
-| [`docs/chat/app.js`](docs/chat/app.js) | Executable chat controller |
-| [`docs/AGI_CAPABILITY_MATRIX.md`](docs/AGI_CAPABILITY_MATRIX.md) | AGI domains and frontier-provider capability map |
-| [`AUTOMATION.md`](AUTOMATION.md) | Autonomous engineering and repository automation |
-| [`SECURITY.md`](SECURITY.md) | Security architecture |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | System topology and runtime composition |
+| [`AUTOMATION.md`](AUTOMATION.md) | Autonomous control plane and engineering lifecycle |
+| [`SECURITY.md`](SECURITY.md) | Security and integrity architecture |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Engineering standards and validation contract |
+| [`docs/README.md`](docs/README.md) | Documentation hub |
+| [`docs/DOCUMENTATION_COVERAGE.md`](docs/DOCUMENTATION_COVERAGE.md) | Documentation completeness and synchronization map |
+| [`docs/AGI_CAPABILITY_MATRIX.md`](docs/AGI_CAPABILITY_MATRIX.md) | AGI capability and frontier research matrix |
+| [`docs/chat/index.html`](docs/chat/index.html) | Live chat interface |
+| [`docs/chat/app.js`](docs/chat/app.js) | Chat controller |
+| [`docs/chat/runtime.json`](docs/chat/runtime.json) | Runtime/provider routing |
+| [`docs/models/free-models.json`](docs/models/free-models.json) | Free/open model and provider registry |
 | [`NOTICE`](NOTICE) | Creator attribution and legal notice |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Engineering workflow |
 | [`LICENSE`](LICENSE) | Apache License 2.0 |
 
 <div align="center">
@@ -232,8 +236,6 @@ Autonomous bootstrap is provided by `scripts/bootstrap.sh`.
 
 **Created by Adam Joseph Rivers · CEO, Synthicsoft Labs LLC**
 
-**AGI capability fabric · Frontier model fabric · Autonomous runtime**
-
-[GitHub](https://github.com/SynthicsoftLabs/Nessy) · [Architecture](ARCHITECTURE.md) · [AGI Matrix](docs/AGI_CAPABILITY_MATRIX.md) · [Chat UI](docs/chat/index.html) · [Security](SECURITY.md)
+**AGI capability fabric · Frontier model fabric · Autonomous engineering · Persistent chat**
 
 </div>
