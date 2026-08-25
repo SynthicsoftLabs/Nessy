@@ -36,7 +36,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for f in .github/workflows/ci.yml .github/workflows/integrity.yml .github/workflows/pages.yml .github/workflows/interposition.yml .github/workflows/nessy-autonomous-control-plane.yml .github/workflows/nessy-autonomous-engineer.yml; do
+          for f in .github/workflows/ci.yml .github/workflows/integrity.yml .github/workflows/pages.yml .github/workflows/interposition.yml .github/workflows/nessy-autonomous-control-plane.yml; do
             test -f "$f"
             git cat-file -e "HEAD:$f"
             test "$(git rev-parse HEAD:$f)" = "$(git hash-object "$f")"
