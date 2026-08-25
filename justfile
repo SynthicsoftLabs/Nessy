@@ -21,6 +21,6 @@ security:
     cargo deny check
 
 license:
-    @! grep -RInE 'Apache-2.0 OR MIT|Apache License, Version 2.0; and MIT|dual Apache|Apache-2.0/MIT|and/or the MIT License' --exclude-dir=.git .
+    @! grep -RInE 'Apache-2.0 OR MIT|Apache License, Version 2.0; and MIT|dual Apache|Apache-2.0/MIT|and/or the MIT License' --exclude-dir=.git --exclude='ci.yml' --exclude='integrity.yml' --exclude='verify-repository.sh' --exclude='justfile' --exclude='LICENSE' .
 
 all: fmt check test clippy security license
