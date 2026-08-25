@@ -33,9 +33,12 @@ jobs:
           with open('/tmp/metadata.json', encoding='utf-8') as f:
               data = json.load(f)
           packages = data.get('packages', [])
+          members = set(data.get('workspace_members', []))
           assert packages, 'workspace metadata contains no packages'
-          bad = [(p['name'], p.get('license')) for p in packages if p.get('license') != 'Apache-2.0']
-          assert not bad, f'non-Apache project package licenses: {bad}'
+          project_packages = [p for p in packages if p.get('id') in members]
+          assert project_packages, 'workspace metadata contains no workspace members'
+          bad = [(p['name'], p.get('license')) for p in project_packages if p.get('license') != 'Apache-2.0']
+          assert not bad, f'non-Apache workspace package licenses: {bad}'
           PY
       - name: Verify no unresolved merge markers
         shell: bash

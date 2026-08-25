@@ -13,12 +13,26 @@ tree="$(git rev-parse HEAD^{tree})"
 test -n "$tree"
 
 git fsck --full --strict
-
 git diff --exit-code
-
 git diff --cached --exit-code
 
-git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | awk '{print $1}' | grep -Fx "$EXPECTED"
+if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
+  head_sha="$(python - <<'PY'
+import json, os
+with open(os.environ['GITHUB_EVENT_PATH'], encoding='utf-8') as f:
+    event = json.load(f)
+print(event['pull_request']['head']['sha'])
+PY
+)"
+  test -n "$head_sha"
+  git cat-file -e "${head_sha}^{commit}"
+  git merge-base --is-ancestor "$head_sha" "$EXPECTED"
+else
+  branch="${GITHUB_REF_NAME:-}"
+  test -n "$branch"
+  remote_sha="$(git ls-remote origin "refs/heads/${branch}" | awk '{print $1}')"
+  test "$remote_sha" = "$EXPECTED"
+fi
 
 api_sha="$(curl --fail --silent --show-error --retry 5 --retry-delay 2 \
   -H 'Accept: application/vnd.github+json' \
