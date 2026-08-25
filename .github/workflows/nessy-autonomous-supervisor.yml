@@ -26,18 +26,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
+      - name: Record supervisor receipt
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number || github.event.inputs.issue_number }}
+        run: |
+          set -euo pipefail
+          gh issue comment "$ISSUE_NUMBER" --body "Nessy Autonomous Supervisor accepted this task and is dispatching the autonomous engineer."
+
       - name: Dispatch autonomous engineer
         id: dispatch
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number || github.event.inputs.issue_number }}
-          ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
           set -euo pipefail
-          START_EPOCH=$(date -u +%s)
-          echo "start_epoch=$START_EPOCH" >> "$GITHUB_OUTPUT"
           gh workflow run nessy-autonomous-engineer.yml \
             --ref main \
             -f issue_number="$ISSUE_NUMBER" \
@@ -66,6 +72,7 @@ jobs:
         run: gh run watch "$RUN_ID" --exit-status --interval 5
 
       - name: Verify and report
+        if: always()
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -73,6 +80,10 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number || github.event.inputs.issue_number }}
         run: |
           set -euo pipefail
+          if [ -z "${RUN_ID:-}" ]; then
+            gh issue comment "$ISSUE_NUMBER" --body "## Nessy autonomous engineering result\n\nSupervisor could not create the autonomous engineer run. The failure is recorded by this supervisor execution and requires repository-side remediation."
+            exit 1
+          fi
           RESULT=$(gh run view "$RUN_ID" --json conclusion,status,url,headSha,workflowName)
           CONCLUSION=$(printf '%s' "$RESULT" | python3 -c 'import json,sys; print(json.load(sys.stdin)["conclusion"])')
           URL=$(printf '%s' "$RESULT" | python3 -c 'import json,sys; print(json.load(sys.stdin)["url"])')
