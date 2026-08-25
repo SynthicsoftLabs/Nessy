@@ -23,7 +23,7 @@ The workflow uses GitHub Copilot CLI in non-interactive mode through the reposit
 
 ## Failure-driven operation
 
-A completed workflow result automatically becomes an engineering input. The autonomous engineer retrieves the run context, reads the affected source and test surface, reproduces any failure, repairs the root cause, reruns the complete validation matrix, and promotes the verified result.
+A completed workflow failure automatically becomes an engineering input. The autonomous engineer retrieves the failing run context, reads the affected source and test surface, reproduces the failure, repairs the root cause, reruns the complete validation matrix, and promotes the verified result.
 
 The same engine also runs on pull-request updates, on pushes to automation branches, and on a recurring schedule so repository drift, stale documentation, latent test failures, and integration defects are continuously discovered rather than waiting for a maintainer to notice them.
 
