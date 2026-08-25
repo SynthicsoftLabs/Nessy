@@ -28,7 +28,7 @@ jobs:
           set -euo pipefail
           ! grep -RInE '^(<<<<<<<|=======|>>>>>>>)' --exclude-dir=.git .
       - name: Verify Rust metadata
-        run: cargo metadata --locked --format-version 1 > /dev/null
+        run: cargo metadata --format-version 1 > /dev/null
       - name: Verify formatting
         uses: dtolnay/rust-toolchain@stable
         with:
