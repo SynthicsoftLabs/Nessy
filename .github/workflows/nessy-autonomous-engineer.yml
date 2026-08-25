@@ -4,7 +4,7 @@ name: Nessy Autonomous Engineer
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'automation/**']
   pull_request:
     types: [opened, synchronize, reopened]
   workflow_run:
