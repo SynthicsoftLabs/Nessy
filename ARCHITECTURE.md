@@ -4,89 +4,52 @@
 
 > **NESSY · Autonomous Intelligence Fabric**
 >
-> One orchestration plane. Many runtimes. An expanding AGI capability graph. Durable state. Continuous discovery and recovery.
+> One capability graph. Many runtimes. Durable state. Provider redundancy. GitHub-backed control state. Repository-native autonomous engineering.
 
----
+## 1. Fabric Overview
 
-## ◈ Fabric Overview
-
-BowserAI is an autonomous distributed intelligence fabric. The system is organized around normalized capabilities rather than a single model, runtime, or execution location. AGI capabilities, frontier providers, always-on runtimes, peer capacity, GitHub-backed infrastructure, inference providers, tools, storage, and execution environments participate through common contracts.
+BowserAI is organized around normalized capabilities instead of dependence on a single model or provider. Models, runtimes, tools, memory, execution environments, GitHub state, and autonomous engineering workflows communicate through explicit contracts.
 
 ```text
-                                      ┌────────────────────────────┐
-                                      │          BOWSERAI          │
-                                      │    AUTONOMOUS INTELLIGENCE │
-                                      │           FABRIC           │
-                                      └─────────────┬──────────────┘
-                                                    │
-                                      ┌─────────────▼──────────────┐
-                                      │    AGI CAPABILITY GRAPH    │
-                                      │ reason · plan · remember   │
-                                      │ learn · research · create  │
-                                      │ perceive · act · evaluate  │
-                                      └─────────────┬──────────────┘
-                                                    │
-                 ┌──────────────────────────────────┼──────────────────────────────────┐
-                 ▼                                  ▼                                  ▼
-        ┌────────────────┐                 ┌────────────────┐                 ┌────────────────┐
-        │     KAIROS     │                 │     TURTLE     │                 │    INFERENCE   │
-        │    ALWAYS-ON   │                 │ ORCHESTRATOR  │                 │ PROVIDER FABRIC│
-        └───────┬────────┘                 └───────┬────────┘                 └───────┬────────┘
-                │                                  │                                  │
-                └──────────────────────────────────┼──────────────────────────────────┘
-                                                   ▼
-        ┌────────────┬────────────┬────────────┬────────────┬────────────┬─────────────┐
-        │   KOOPA    │    MCP     │  STORAGE   │  IDENTITY  │   GITHUB   │   PEER/P2P  │
-        │  EXECUTE   │   TOOLS    │ DURABLE CAS│   AGENTS   │  BACKEND   │   RUNTIMES   │
-        └────────────┴────────────┴────────────┴────────────┴────────────┴─────────────┘
-                                                   │
-                                                   ▼
-                                      OBSERVE → EVALUATE → LEARN
-                                                   │
-                                                   └──────────► DISCOVER
+                            BOWSERAI / NESSY
+                                  │
+                           CAPABILITY GRAPH
+                                  │
+       ┌──────────────────────────┼──────────────────────────┐
+       ▼                          ▼                          ▼
+    KAIROS                     TURTLE                    INFERENCE
+  always-on runtime        orchestration/state       provider/model fabric
+       │                          │                          │
+       └──────────────────────────┼──────────────────────────┘
+                                  ▼
+       ┌────────────┬────────────┬────────────┬────────────┬────────────┐
+       │   KOOPA    │    MCP     │  STORAGE   │  IDENTITY  │  GITHUB    │
+       │ execution  │   tools    │ durable CAS│  agents    │  backend   │
+       └────────────┴────────────┴────────────┴────────────┴────────────┘
+                                  │
+                                  ▼
+                       OBSERVE → EVALUATE → LEARN
+                                  │
+                                  └────────► DISCOVER
 ```
 
-## 🧠 AGI Capability Graph
+## 2. Capability Graph
 
-The capability subsystem models AGI functionality as composable runtime nodes. Current domains include reasoning, verification, reflection, hypothesis generation, theorem proving, hierarchical and long-horizon planning, memory systems, retrieval and consolidation, learning, skill acquisition, agent delegation, councils, computer use, coding, research, multimodality, generation, scientific computation, security, infrastructure, provenance, and audit.
+Capabilities are executable runtime contracts. Domains include reasoning, verification, reflection, planning, memory, learning, agents, computer use, coding, research, multimodality, generation, scientific computation, security, infrastructure, governance, and interaction.
 
-Each capability node carries identity, provider, version, inputs, outputs, prerequisites, quality, latency, and health information. The graph can register multiple providers for the same capability and compose the healthiest/highest-quality available provider for a requested capability.
+A capability registration includes identity, version, provider, input/output contract, prerequisites, quality, latency, health, authorization, telemetry, recovery, provenance, and evaluation metadata.
 
-See [`docs/AGI_CAPABILITY_MATRIX.md`](docs/AGI_CAPABILITY_MATRIX.md) and `crates/capability/src/agi.rs`.
+Multiple implementations can satisfy the same capability. The routing layer selects and composes compatible providers and can recover to alternate implementations when a provider becomes unavailable or unhealthy.
 
-## 🌐 Frontier Provider Fabric
+See [`docs/AGI_CAPABILITY_MATRIX.md`](docs/AGI_CAPABILITY_MATRIX.md).
 
-Frontier research is normalized into the capability vocabulary rather than represented as a static model list. Current project coverage includes:
+## 3. Frontier + Free Model Fabric
 
-**Fable · Glasswing · Qwen · Gemini · Grok · Seed · Seedance · Perplexity · Z.ai / GLM · Gemma**
+Frontier research is normalized into the capability vocabulary. Current named coverage includes Fable, Glasswing, Qwen, Gemini, Grok, Seed, Seedance, Perplexity, Z.ai / GLM, and Gemma, alongside broader provider families.
 
-The provider fabric is extensible: new models and systems can register capabilities against the same contracts.
+The repository also contains `docs/models/free-models.json`, a machine-readable catalog derived from the public `12britz/awesome-free-models` resource. It separates discovery metadata from runtime availability so the router can reason about access, credentials, capability, modality, context, and licensing without treating every entry as a guaranteed browser endpoint.
 
-```text
-RESEARCH
-   ↓
-CAPABILITY EXTRACTION
-   ↓
-NORMALIZED CONTRACT
-   ↓
-PROVIDER REGISTRY
-   ↓
-CAPABILITY GRAPH
-   ↓
-TASK DECOMPOSITION
-   ↓
-PARALLEL COMPOSITION
-   ↓
-EXECUTION
-   ↓
-OBSERVATION / EVALUATION
-   ↓
-MEMORY / SKILL REGISTRATION
-   ↓
-CONTINUOUS DISCOVERY
-```
-
-## ⚡ Autonomous Selection Loop
+## 4. Runtime Topology
 
 ```text
 DISCOVER → REGISTER → MATCH → COMPOSE → ROUTE → EXECUTE
@@ -95,57 +58,120 @@ DISCOVER → REGISTER → MATCH → COMPOSE → ROUTE → EXECUTE
     └──── RECOVER ← CHECKPOINT ← EVALUATE ← OBSERVE
 ```
 
-There is no mandatory human approval transition in the normal execution loop. Identity, authority, execution policy, state, and telemetry remain machine-readable runtime semantics.
+### Kairos
 
-## 🛰️ Kairos
+`kairos` is the always-on runtime integration. Its transport is encapsulated behind the runtime contract and may use the configured `KAIROS_URL` / public Kairos service.
 
-`kairos` is a first-class always-on runtime integration. Its endpoint is configurable through `KAIROS_URL`, with the project default targeting `https://the-real-kairos.com`. The adapter keeps transport-specific behavior behind the runtime contract.
+### Turtle
 
-## 🐢 Turtle
+Turtle owns task identity, queueing, scheduling, claiming, lifecycle state, distributed synchronization, checkpoints, and recovery.
 
-Turtle owns task identity, queueing, claiming, lifecycle transitions, persistence, recovery, scheduling, and distributed synchronization. It composes capability providers without coupling task semantics to any one model or runtime.
+### Koopa
 
-## 🛡️ Koopa
+Koopa provides execution backends including WASI, containers, microVMs, remote runners, and policy-controlled native execution.
 
-Koopa supplies execution backends including WASI, containers, microVMs, remote runners, and policy-controlled native execution. Execution is selected through capability contracts.
+### MCP
 
-## 🧰 MCP
+MCP supplies tool discovery, registration, validation, and dispatch. Tool capabilities participate in the common capability graph.
 
-MCP supplies tool discovery, registration, validation, dispatch, and transport integration. MCP capabilities participate in the same AGI/tool composition graph.
+### Storage
 
-## 💾 State
+Durable task state, checkpoints, artifacts, project data, content-addressed objects, and persistent conversation state survive individual runtime failure.
 
-Durable task identity, checkpoints, content-addressed artifacts, replicated metadata, and recoverable execution plans keep state independent of a single runtime. Storage can combine GitHub-backed project/control state, persistent databases, and content-addressed persistence.
+### GitHub Backend
 
-## 🐙 GitHub Backend
+`github-backend` treats GitHub as a first-class public project/control substrate for repository state, automation, artifacts, issue/PR workflows, and distribution.
 
-`github-backend` makes GitHub a first-class project/control substrate. Repository state, project artifacts, automation, and public distribution are integrated into the broader runtime architecture.
+## 5. Repository-Native Chat
 
-## 🔗 Dependency Direction
+The browser chat is an executable product surface, not documentation decoration.
 
 ```text
-                   frontier providers / runtimes
-                    │        │         │
-              ┌─────┴────────┴─────────┴─────┐
-              ▼                              ▼
-       provider adapters               GitHub backend
-              │                              │
-              └──────────────┬───────────────┘
-                             ▼
-                    capability contracts
-                             │
-                             ▼
-                      AGI capability graph
-                             │
-                             ▼
-                           Turtle
-                             │
-                             ▼
-                        bowser-core
+README → HTML renderer → chat/index.html → chat/app.js
+                                           │
+                            ┌──────────────┼──────────────┐
+                            ▼              ▼              ▼
+                         Kairos        cloud/API      browser inference
+                                           │              │
+                                           └──────┬───────┘
+                                                  ▼
+                                         persistent session state
 ```
 
-Shared domain contracts remain provider-neutral. Provider-specific behavior terminates at adapters, while capability semantics remain stable.
+The chat persists conversations until explicitly cleared, supports search/import/export/pinning/share/copy/regeneration, and routes across multiple inference surfaces. The model-request context layer can use stored history without deleting the underlying transcript.
 
-## ✦ Platform Surface
+## 6. Autonomous Engineering Control Plane
 
-The architecture encompasses AGI capability composition, frontier-model integration, identity, memory, learning, inference, Kairos, distributed synchronization, sandboxed execution, MCP, GitHub-backed control state, durable storage, observability, clients, deployment, reproducible distribution, and automated recovery as one integrated platform.
+The repository has one authoritative autonomous engineering architecture:
+
+```text
+EVENT
+  │
+  ▼
+NESSY AUTONOMOUS CONTROL PLANE
+  │
+  ▼
+NESSY AUTONOMOUS ENGINEER
+  │
+  ├─ establish Git/DAG/repository context
+  ├─ inspect README / architecture / blame / dependencies
+  ├─ reproduce observed failure
+  ├─ add regression coverage
+  ├─ implement root-cause change
+  ├─ run full validation matrix
+  ├─ create atomic Conventional Commit
+  ├─ create/update automation branch + PR
+  ├─ monitor validation
+  ├─ promote verified change
+  └─ verify resulting main SHA
+```
+
+The control plane is event-driven across pushes, pull requests, issues, workflow completions, recurring schedules, and machine dispatch. The worker receives an explicit objective and target reference and performs the engineering cycle without operator prompts during normal operation.
+
+Legacy competing autonomous controllers have been retired so the repository does not have multiple independent promotion loops.
+
+## 7. State and Recovery
+
+State is separated into:
+
+- working/session context;
+- durable task/project state;
+- content-addressed artifacts;
+- repository history;
+- capability/provider metadata;
+- audit and telemetry records.
+
+A failed runtime can be replaced without rewriting task identity. Checkpoints and content addressing allow recovery, verification, replication, and provider migration.
+
+## 8. Security and Integrity
+
+Security semantics are explicit at identity, authority, tool, execution, network, secret, storage, and artifact layers. Repository integrity checks verify checkout identity, unresolved merge markers, dependency metadata, licensing, audit policy, SBOM generation, and interposition state.
+
+See [`SECURITY.md`](SECURITY.md).
+
+## 9. Dependency Direction
+
+```text
+models / providers / runtimes
+            │
+            ▼
+      provider adapters
+            │
+            ▼
+    capability contracts
+            │
+            ▼
+      capability graph
+            │
+            ▼
+          Turtle
+            │
+            ▼
+       bowser-core
+```
+
+Provider-specific behavior terminates at adapters. Shared contracts remain provider-neutral.
+
+## 10. Documentation and Source of Truth
+
+The executable implementation is authoritative. The documentation hub at [`docs/README.md`](docs/README.md) indexes the canonical surfaces, while [`docs/DOCUMENTATION_COVERAGE.md`](docs/DOCUMENTATION_COVERAGE.md) records what must remain synchronized as the platform evolves.
