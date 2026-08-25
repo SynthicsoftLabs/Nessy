@@ -4,7 +4,7 @@ name: Nessy Autonomous Engineer
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'automation/**']
   pull_request:
     types: [opened, synchronize, reopened]
   workflow_run:
@@ -38,7 +38,6 @@ env:
 jobs:
   engineer:
     if: >-
-      (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'failure') &&
       (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) &&
       (github.event_name != 'workflow_run' || github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
