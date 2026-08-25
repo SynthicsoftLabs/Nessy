@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "source": {
+    "name": "12britz/awesome-free-models",
+    "url": "https://github.com/12britz/awesome-free-models",
+    "verified_at": "2026-08-22",
+    "purpose": "Discovery seed for redundant model and provider routing"
+  },
+  "policy": {
+    "source_is_catalog_only": true,
+    "runtime_capability_must_be_verified": true,
+    "license_must_be_verified_per_model": true,
+    "credentials_must_never_be_embedded": true
+  },
+  "open_weight": [
+    {"name":"Muse Glimmer","family":"Muse","provider":"Meta Superintelligence Lab","license":"Apache-2.0","context_tokens":131000,"modalities":["text","vision"],"roles":["agent","reasoning","tool_use"],"source":"catalog"},
+    {"name":"Llama 4 Scout","family":"Llama","provider":"Meta","context_tokens":10000000,"modalities":["text","vision"],"roles":["general","reasoning","multimodal"],"source":"catalog"},
+    {"name":"DeepSeek V4 Pro","family":"DeepSeek","provider":"DeepSeek","license":"MIT","context_tokens":1000000,"modalities":["text"],"roles":["reasoning","coding","agent"],"source":"catalog"},
+    {"name":"DeepSeek-V4-Flash","family":"DeepSeek","provider":"DeepSeek","license":"MIT","context_tokens":1000000,"modalities":["text"],"roles":["fast","coding","agent"],"source":"catalog"},
+    {"name":"Gemma 4 E4B","family":"Gemma","provider":"Google","license":"Apache-2.0","context_tokens":256000,"modalities":["text","vision"],"roles":["general","reasoning","edge"],"source":"catalog"},
+    {"name":"GLM-5.2","family":"GLM","provider":"Zhipu AI","license":"MIT","context_tokens":1000000,"modalities":["text"],"roles":["coding","agent","reasoning"],"source":"catalog"},
+    {"name":"MiniMax M3","family":"MiniMax","provider":"MiniMax","context_tokens":1000000,"modalities":["text","vision"],"roles":["general","agent","computer_use"],"source":"catalog"},
+    {"name":"Step 3.7 Flash","family":"Step","provider":"StepFun","license":"Apache-2.0","modalities":["text","vision"],"roles":["fast","agent","multimodal"],"source":"catalog"},
+    {"name":"Qwen 3.6-35B-A3B","family":"Qwen","provider":"Alibaba","license":"Apache-2.0","modalities":["text"],"roles":["coding","reasoning","agent"],"source":"catalog"},
+    {"name":"Phi-4 14B","family":"Phi","provider":"Microsoft","license":"MIT","modalities":["text"],"roles":["reasoning","coding","edge"],"source":"catalog"},
+    {"name":"Mistral Small 4","family":"Mistral","provider":"Mistral AI","license":"Apache-2.0","modalities":["text","vision"],"roles":["general","reasoning","multilingual"],"source":"catalog"},
+    {"name":"Hermes 4","family":"Hermes","provider":"NousResearch","license":"Apache-2.0","modalities":["text"],"roles":["agent","learning","tool_use"],"source":"catalog"}
+  ],
+  "api_providers": [
+    {"name":"Google AI Studio","kind":"free_tier","models":["Gemini"],"openai_compatible":false,"credentials":"required","source":"catalog"},
+    {"name":"OpenRouter","kind":"router","free_models":true,"openai_compatible":true,"credentials":"required","source":"catalog"},
+    {"name":"AnyAPI","kind":"router","free_models":true,"openai_compatible":true,"credentials":"required","source":"catalog"},
+    {"name":"Groq","kind":"provider","free_models":true,"openai_compatible":true,"credentials":"required","source":"catalog"},
+    {"name":"Hugging Face Inference Providers","kind":"provider","free_models":true,"openai_compatible":false,"credentials":"required","source":"catalog"},
+    {"name":"NVIDIA NIM","kind":"provider","free_models":true,"openai_compatible":false,"credentials":"required","source":"catalog"},
+    {"name":"Cloudflare Workers AI","kind":"edge_provider","free_models":true,"openai_compatible":false,"credentials":"required","source":"catalog"},
+    {"name":"OpenCode Zen","kind":"router","free_models":true,"openai_compatible":true,"credentials":"required","source":"catalog"},
+    {"name":"LLM7.io","kind":"provider","free_models":true,"openai_compatible":true,"credentials":"optional","source":"catalog"},
+    {"name":"Nscale","kind":"provider","free_models":true,"openai_compatible":true,"credentials":"required","source":"catalog"},
+    {"name":"Pollinations","kind":"provider","openai_compatible":true,"credentials":"current-policy-dependent","source":"catalog"}
+  ],
+  "routers": [
+    {"name":"9Router","providers":"40+","free_provider_support":true,"license":"MIT","source":"catalog"},
+    {"name":"OmniRoute","providers":"250+","free_provider_support":true,"source":"catalog"},
+    {"name":"LiteLLM","providers":"100+","free_provider_support":true,"license":"MIT","source":"catalog"},
+    {"name":"Portkey AI Gateway","providers":"multi-provider","free_provider_support":true,"source":"catalog"}
+  ],
+  "local_backends": [
+    {"name":"Ollama","platforms":["linux","macos","windows"],"source":"catalog"},
+    {"name":"llama.cpp","platforms":["cpu","gpu"],"source":"catalog"},
+    {"name":"LM Studio","platforms":["macos","windows","linux"],"source":"catalog"},
+    {"name":"LocalAI","openai_compatible":true,"source":"catalog"},
+    {"name":"vLLM","production_throughput":true,"source":"catalog"},
+    {"name":"llamafile","single_file":true,"source":"catalog"}
+  ],
+  "selection": {
+    "primary_general": ["Gemma 4 E4B","Qwen 3.6-35B-A3B","Mistral Small 4"],
+    "primary_reasoning": ["DeepSeek V4 Pro","GLM-5.2","Muse Glimmer"],
+    "primary_coding": ["Qwen 3.6-35B-A3B","DeepSeek V4 Pro","GLM-5.2"],
+    "primary_fast": ["DeepSeek-V4-Flash","Step 3.7 Flash","Phi-4 14B"],
+    "primary_agent": ["Hermes 4","MiniMax M3","Muse Glimmer"],
+    "browser_safe": ["SmolLM2-1.7B-Instruct","SmolLM2-360M-Instruct","SmolLM2-135M-Instruct"]
+  }
+}
