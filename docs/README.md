@@ -14,6 +14,7 @@ Nessy documentation is organized around one implementation: the BowserAI autonom
 | [`../SECURITY.md`](../SECURITY.md) | Identity, execution, network, MCP, state, secrets, supply chain, integrity, and recovery |
 | [`../CONTRIBUTING.md`](../CONTRIBUTING.md) | Repository engineering standards and automated change lifecycle |
 | [`AGI_CAPABILITY_MATRIX.md`](AGI_CAPABILITY_MATRIX.md) | Capability vocabulary, frontier coverage, and research-to-runtime methodology |
+| [`SELF_DEVELOPMENT.md`](SELF_DEVELOPMENT.md) | Autonomous product-development policy and objective-selection program |
 | [`DOCUMENTATION_COVERAGE.md`](DOCUMENTATION_COVERAGE.md) | Documentation completeness map and synchronization rule |
 | [`chat/index.html`](chat/index.html) | Repository-native chat surface |
 | [`chat/app.js`](chat/app.js) | Chat controller and runtime/session behavior |
@@ -35,9 +36,11 @@ DISCOVER → REGISTER → NORMALIZE → MATCH → COMPOSE → ROUTE → EXECUTE
 EVENT → CONTROL PLANE → ENGINEER → REPRODUCE → TEST → FIX → VALIDATE
                                                      ↓
                            COMMIT → PR → PROMOTE → VERIFY MAIN
+                                                     ↓
+                                            SELF-DEVELOP NEXT OBJECTIVE
 ```
 
-The repository is designed so routine engineering operation proceeds from repository state and machine-readable evidence rather than an operator-driven setup sequence.
+The repository is designed so routine engineering and proactive product development proceed from repository state and machine-readable evidence rather than an operator-driven setup sequence.
 
 ## Documentation synchronization
 

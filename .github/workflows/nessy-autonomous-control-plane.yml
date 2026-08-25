@@ -1,5 +1,4 @@
-# Copyright 2026 Adam Joseph Rivers, CEO, Synthicsoft Labs LLC.
-# Licensed under the Apache License, Version 2.0.
+# Copyright 2026 Adam Joseph Rivers, CEO, Synthicsoft Labs LLC. Licensed under Apache-2.0.
 name: Nessy Autonomous Control Plane
 
 on:
@@ -30,13 +29,13 @@ permissions:
   checks: read
   copilot-requests: write
 
-concurrency:
-  group: nessy-autonomous-control-${{ github.event.pull_request.number || github.event.issue.number || github.event.workflow_run.id || github.ref_name }}
-  cancel-in-progress: true
-
 env:
   GH_TOKEN: ${{ github.token }}
   GH_REPO: ${{ github.repository }}
+
+concurrency:
+  group: nessy-autonomous-control-${{ github.event.pull_request.number || github.event.issue.number || github.event.workflow_run.id || github.ref_name }}
+  cancel-in-progress: true
 
 jobs:
   dispatch:
@@ -53,39 +52,27 @@ jobs:
           target_ref='main'
           issue_number=''
           objective=''
-
           case "$event" in
             pull_request)
               target_ref='${{ github.event.pull_request.head.ref }}'
               issue_number='${{ github.event.pull_request.number }}'
-              objective="Validate and complete pull request #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}"
-              ;;
+              objective="Validate and complete pull request #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}" ;;
             issues)
               issue_number='${{ github.event.issue.number }}'
-              objective='${{ github.event.issue.title }}: ${{ github.event.issue.body }}'
-              ;;
+              objective='${{ github.event.issue.title }}: ${{ github.event.issue.body }}' ;;
             workflow_run)
               target_ref='${{ github.event.workflow_run.head_branch }}'
-              objective="Repair failed or reconcile completed workflow run ${{ github.event.workflow_run.id }} (${{ github.event.workflow_run.name }}, ${{ github.event.workflow_run.conclusion }}, SHA ${{ github.event.workflow_run.head_sha }}). Inspect the actual run, affected code, logs, checks, and repository state, then perform the complete engineering cycle."
-              ;;
+              objective="Repair failed or reconcile completed workflow run ${{ github.event.workflow_run.id }} (${{ github.event.workflow_run.name }}, ${{ github.event.workflow_run.conclusion }}, SHA ${{ github.event.workflow_run.head_sha }}). Inspect the actual run, affected code, logs, checks, and repository state, then perform the complete engineering cycle." ;;
             push)
-              objective='Run the complete autonomous repository audit against the new main commit. Inspect lineage, documentation, automation, runtime/chat surfaces, model/provider catalog, integrity, licensing, tests, and all active workflows. Repair every concrete defect found and promote verified fixes automatically.'
-              ;;
+              objective='Run the complete autonomous repository development cycle against the new main commit. Inspect lineage, code, tests, architecture, documentation, automation, runtime/chat surfaces, model/provider catalog, capability graph, security, integrity, licensing, release surfaces, and active workflows. Repair defects and implement the highest-value missing capability discovered from repository evidence. Synchronize documentation and registries, validate the complete tree, and promote verified work automatically.' ;;
             schedule)
-              objective='Run the complete autonomous repository maintenance and health cycle. Discover latent defects, stale configuration, broken automation, dependency issues, documentation drift, runtime/chat failures, security/integrity problems, and incomplete features. Repair and validate all findings.'
-              ;;
+              objective='Run the complete autonomous Nessy self-development cycle. Discover the highest-value unresolved engineering opportunities across functionality, tests, security, redundancy, recovery, capability coverage, model/provider integration, chat UX, infrastructure, performance, documentation, research ingestion, release engineering, and maintainability. Select one atomic objective using docs/SELF_DEVELOPMENT.md, research the existing implementation and current external capability landscape, implement the objective, add regression/acceptance coverage, synchronize documentation and registries, run the complete validation matrix, and promote only the verified result.' ;;
             workflow_dispatch)
-              objective='Run the complete autonomous repository engineering and health cycle from current main state.'
-              ;;
+              objective='Run the complete autonomous repository development and health cycle from current main state, using docs/SELF_DEVELOPMENT.md to derive the next highest-value atomic objective when no explicit objective is supplied.' ;;
           esac
-
           echo "target_ref=$target_ref" >> "$GITHUB_OUTPUT"
           echo "issue_number=$issue_number" >> "$GITHUB_OUTPUT"
-          {
-            echo 'objective<<NESSY_OBJECTIVE'
-            printf '%s\n' "$objective"
-            echo 'NESSY_OBJECTIVE'
-          } >> "$GITHUB_OUTPUT"
+          { echo 'objective<<NESSY_OBJECTIVE'; printf '%s\n' "$objective"; echo 'NESSY_OBJECTIVE'; } >> "$GITHUB_OUTPUT"
 
       - name: Record controller receipt
         shell: bash
@@ -94,9 +81,7 @@ jobs:
           OBJECTIVE: ${{ steps.context.outputs.objective }}
         run: |
           set -euo pipefail
-          if [ -n "$ISSUE_NUMBER" ]; then
-            gh issue comment "$ISSUE_NUMBER" --repo "$GH_REPO" --body "Nessy Autonomous Control Plane accepted this machine event and dispatched the autonomous engineering worker."
-          fi
+          if [ -n "$ISSUE_NUMBER" ]; then gh issue comment "$ISSUE_NUMBER" --repo "$GH_REPO" --body "Nessy Autonomous Control Plane accepted this machine event and dispatched the autonomous engineering worker."; fi
           echo '### Nessy Autonomous Control Plane' >> "$GITHUB_STEP_SUMMARY"
           echo "- Event: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- Target ref: ${{ steps.context.outputs.target_ref }}" >> "$GITHUB_STEP_SUMMARY"
@@ -110,12 +95,7 @@ jobs:
           OBJECTIVE: ${{ steps.context.outputs.objective }}
         run: |
           set -euo pipefail
-          gh workflow run nessy-autonomous-engineer.yml \
-            --repo "$GH_REPO" \
-            --ref main \
-            -f target_ref="$TARGET_REF" \
-            -f objective="$OBJECTIVE" \
-            -f issue_number="$ISSUE_NUMBER"
+          gh workflow run nessy-autonomous-engineer.yml --repo "$GH_REPO" --ref main -f target_ref="$TARGET_REF" -f objective="$OBJECTIVE" -f issue_number="$ISSUE_NUMBER"
 
       - name: Verify dispatch
         shell: bash
@@ -123,10 +103,7 @@ jobs:
           set -euo pipefail
           for attempt in $(seq 1 20); do
             run_id=$(gh run list --repo "$GH_REPO" --workflow nessy-autonomous-engineer.yml --event workflow_dispatch --limit 20 --json databaseId,headBranch,status --jq '.[] | select(.headBranch == "main") | .databaseId' | head -n1)
-            if [ -n "$run_id" ]; then
-              echo "Worker run: $run_id" >> "$GITHUB_STEP_SUMMARY"
-              exit 0
-            fi
+            if [ -n "$run_id" ]; then echo "Worker run: $run_id" >> "$GITHUB_STEP_SUMMARY"; exit 0; fi
             sleep 3
           done
           echo 'Autonomous engineer dispatch was not observable after 60 seconds.' >&2

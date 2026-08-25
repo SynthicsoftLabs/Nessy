@@ -1,5 +1,4 @@
-# Copyright 2026 Adam Joseph Rivers, CEO, Synthicsoft Labs LLC.
-# Licensed under the Apache License, Version 2.0.
+# Copyright 2026 Adam Joseph Rivers, CEO, Synthicsoft Labs LLC. Licensed under the Apache License, Version 2.0.
 name: Nessy Autonomous Engineer
 
 on:
@@ -61,20 +60,16 @@ jobs:
           test -f README.md
           test -f AUTOMATION.md
           test -f CONTRIBUTING.md
+          test -f docs/SELF_DEVELOPMENT.md
           test -f Cargo.toml
 
       - name: Resolve task evidence
         shell: bash
         env:
           ISSUE_NUMBER: ${{ github.event.inputs.issue_number }}
-          OBJECTIVE: ${{ github.event.inputs.objective }}
         run: |
           set -euo pipefail
-          if [ -n "$ISSUE_NUMBER" ]; then
-            gh issue view "$ISSUE_NUMBER" --repo "$GH_REPO" --json number,title,body,url > /tmp/nessy-issue.json
-          else
-            printf '%s\n' '{"number":null,"title":"autonomous-maintenance","body":""}' > /tmp/nessy-issue.json
-          fi
+          if [ -n "$ISSUE_NUMBER" ]; then gh issue view "$ISSUE_NUMBER" --repo "$GH_REPO" --json number,title,body,url > /tmp/nessy-issue.json; else printf '%s\n' '{"number":null,"title":"autonomous-maintenance","body":""}' > /tmp/nessy-issue.json; fi
           git status --short > /tmp/nessy-status.txt
           git branch --show-current > /tmp/nessy-branch.txt
           git rev-parse HEAD > /tmp/nessy-head.txt
@@ -94,32 +89,37 @@ jobs:
         env:
           ISSUE_NUMBER: ${{ github.event.inputs.issue_number }}
           OBJECTIVE: ${{ github.event.inputs.objective }}
+          TARGET_REF: ${{ github.event.inputs.target_ref }}
         run: |
           set -euo pipefail
           ISSUE_CONTEXT="$(cat /tmp/nessy-issue.json)"
           RUN_CONTEXT="$(cat /tmp/nessy-runs.json)"
           PR_CONTEXT="$(cat /tmp/nessy-prs.json)"
-          export ISSUE_CONTEXT ISSUE_NUMBER OBJECTIVE RUN_CONTEXT PR_CONTEXT
+          SELF_DEVELOPMENT_CONTEXT="$(cat docs/SELF_DEVELOPMENT.md)"
+          export ISSUE_CONTEXT ISSUE_NUMBER OBJECTIVE TARGET_REF RUN_CONTEXT PR_CONTEXT SELF_DEVELOPMENT_CONTEXT
           copilot -p 'You are Nessy Autonomous Engineer operating inside SynthicsoftLabs/Nessy.
 
-Execute the complete repository engineering cycle without asking a human for input.
+Execute the complete repository engineering and self-development cycle without asking a human for input.
 
 Repository contract:
-- Read git log --oneline --graph -n 20, README.md, AUTOMATION.md, CONTRIBUTING.md, affected source, tests, workflows, and git blame before editing.
-- Establish the exact failure or objective from machine evidence: OBJECTIVE, ISSUE_CONTEXT, RUN_CONTEXT, PR_CONTEXT, repository state, active PRs, and workflow history.
-- Reproduce observed failures before implementing fixes. Add a focused regression test before the fix where practical.
-- Trace callers, dependency edges, workflow consumers, and public interfaces before changing behavior.
-- Implement a complete root-cause change. No TODOs, placeholders, commented dead code, hardcoded secrets, or unrelated rewrites.
-- Run the complete validation matrix: cargo fmt --all -- --check; cargo check --workspace --all-targets; cargo test --workspace --all-targets; cargo clippy --workspace --all-targets --all-features -- -D warnings; cargo audit; cargo deny check; relevant Node syntax/tests; repository integrity; and relevant project scripts.
-- On failure, inspect the actual error, repair the cause, rerun the affected gate, then rerun the complete matrix.
-- Inspect the final diff for atomicity, idempotency, documentation, merge markers, credentials, unrelated changes, and generated artifacts.
+- Read git log --oneline --graph -n 20, README.md, AUTOMATION.md, CONTRIBUTING.md, docs/SELF_DEVELOPMENT.md, affected source, tests, workflows, and git blame before editing.
+- Establish the exact failure or objective from machine evidence: OBJECTIVE, ISSUE_CONTEXT, RUN_CONTEXT, PR_CONTEXT, TARGET_REF, repository state, active PRs, workflow history, and the self-development policy.
+- When the objective is scheduled/self-development work, inspect the entire repository and derive the highest-value unresolved atomic development objective using docs/SELF_DEVELOPMENT.md. Do not wait for a human-maintained backlog.
+- Research relevant repository history and current external capability/model/provider documentation when new functionality or integrations are warranted. Normalize discoveries into the repository registries and capability vocabulary.
+- Reproduce observed failures before implementing fixes. Add a focused regression or acceptance test before the fix where practical.
+- Trace callers, dependency edges, workflow consumers, public interfaces, and documentation consumers before changing behavior.
+- Implement a complete root-cause change or complete feature increment. No TODOs, placeholders, commented dead code, hardcoded secrets, speculative rewrites, or unrelated changes.
+- Synchronize README, canonical documentation, capability matrices, runtime registries, model registries, and legal/attribution documentation whenever the implementation changes them.
+- Run the complete validation matrix: cargo fmt --all -- --check; cargo check --workspace --all-targets; cargo test --workspace --all-targets; cargo clippy --workspace --all-targets --all-features -- -D warnings; cargo audit; cargo deny check; relevant Node syntax/tests; repository integrity; interposition verification; and relevant project scripts.
+- On failure, inspect the actual error, repair the cause, rerun the affected gate, then rerun the complete validation matrix.
+- Inspect the final diff for atomicity, idempotency, documentation synchronization, merge markers, credentials, unrelated changes, generated artifacts, and accidental public API drift.
 - Use one strict Conventional Commit for one logical change.
-- Never push directly to main. When the checked-out ref is main, create an automation/* branch from main before committing repairs. When a pull-request ref is supplied, continue on that same-repository branch and keep its scope atomic.
+- Never push directly to main. If TARGET_REF is main, create an automation/* branch from main before committing. If TARGET_REF is an automation or pull-request branch, continue on that same-repository branch and keep its scope atomic.
 - Push the branch, create or update the appropriate pull request, monitor all checks, and enable automatic merge when every required validation succeeds.
 - After promotion, verify main points to the expected commit and rerun integrity/readiness checks against that exact SHA.
-- If ISSUE_NUMBER is set, comment the exact result, commit/PR, validation result, and verified main SHA on the issue.
+- If ISSUE_NUMBER is set, comment the exact objective, changed commit/PR, validation result, and verified main SHA on the issue.
 
-Do not ask for confirmation. Do not declare success from intended workflow state; verify actual GitHub state.' --allow-tool='shell(git:*)' --allow-tool='shell(gh:*)' --allow-tool='shell(cargo:*)' --allow-tool='shell(node:*)' --allow-tool='shell(npm:*)' --allow-tool=write --allow-tool=edit --no-ask-user
+No human approval step is part of the normal repository engineering cycle. Do not declare success from intended workflow state; verify actual GitHub state.' --allow-tool='shell(git:*)' --allow-tool='shell(gh:*)' --allow-tool='shell(cargo:*)' --allow-tool='shell(node:*)' --allow-tool='shell(npm:*)' --allow-tool=write --allow-tool=edit --no-ask-user
 
       - name: Autonomous post-agent validation
         shell: bash
@@ -154,6 +154,4 @@ Do not ask for confirmation. Do not declare success from intended workflow state
           echo "- Target ref: ${{ github.event.inputs.target_ref }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- Branch: $BRANCH" >> "$GITHUB_STEP_SUMMARY"
           echo "- SHA: $SHA" >> "$GITHUB_STEP_SUMMARY"
-          if [ -n "$ISSUE_NUMBER" ]; then
-            gh issue comment "$ISSUE_NUMBER" --repo "$GH_REPO" --body "Nessy Autonomous Engineer completed its machine-driven engineering cycle at $SHA on $BRANCH. Validation is represented by this workflow result and the repository CI gates."
-          fi
+          if [ -n "$ISSUE_NUMBER" ]; then gh issue comment "$ISSUE_NUMBER" --repo "$GH_REPO" --body "Nessy Autonomous Engineer completed its machine-driven engineering cycle at $SHA on $BRANCH. Validation is represented by this workflow result and the repository CI gates."; fi

@@ -13,6 +13,7 @@ This document is the completeness map for the repository's public documentation.
 | Browser chat | `docs/chat/index.html`, `docs/chat/app.js` |
 | Durable chat history and session UX | `docs/chat/app.js`, `README.md` |
 | Autonomous engineering | `AUTOMATION.md`, `.github/workflows/nessy-autonomous-control-plane.yml`, `.github/workflows/nessy-autonomous-engineer.yml` |
+| Autonomous product self-development | `docs/SELF_DEVELOPMENT.md`, `AUTOMATION.md`, autonomous control-plane schedule |
 | CI/build/test policy | `CONTRIBUTING.md`, `.github/workflows/ci.yml`, `.github/workflows/preflight.yml` |
 | Repository integrity/interposition | `SECURITY.md`, `.github/workflows/integrity.yml`, `.github/workflows/interposition.yml` |
 | Security architecture | `SECURITY.md` |
@@ -37,9 +38,12 @@ Nessy documentation covers the following operational surfaces:
 - Durable storage and content addressing.
 - Agent identity and authorization.
 - Observability, integrity, SBOM, dependency auditing, and policy gates.
-- Autonomous issue, pull-request, workflow, and scheduled maintenance triggers.
+- Autonomous issue, pull-request, workflow, and scheduled triggers.
+- Proactive self-development cycles that derive new objectives from repository evidence.
 - Automated diagnosis, regression testing, repair, validation, promotion, and post-merge verification.
+- Research ingestion and normalization into model/provider/capability registries.
+- Continuous documentation and registry synchronization.
 
 ## Documentation rule
 
-When an implementation change introduces a new user-visible capability, runtime contract, provider, workflow, data format, or operational lifecycle, the same logical change must update the applicable canonical documentation and this coverage map.
+When an implementation change introduces a new user-visible capability, runtime contract, provider, workflow, data format, development policy, or operational lifecycle, the same logical change must update the applicable canonical documentation and this coverage map.
