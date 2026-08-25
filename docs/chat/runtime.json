@@ -1,12 +1,13 @@
 {
-  "version": 7,
+  "version": 8,
   "project": "BowserAI/Nessy",
+  "catalog": "../models/free-models.json",
   "discovery": {
     "strategy": "embedded-first",
     "configuration": "repository",
     "manual_endpoint_required": false,
     "embedded_manifest_fallback": true,
-    "failover": "remote-first-with-browser-inference-fallback",
+    "failover": "provider-matrix-plus-browser-inference",
     "manifest_timeout_ms": 6000,
     "runtime_timeout_ms": 8000
   },
@@ -20,11 +21,74 @@
       "format": "openai"
     },
     {
+      "name": "google-ai-studio",
+      "base": "https://generativelanguage.googleapis.com",
+      "chat_paths": ["/v1beta/models/{model}:generateContent"],
+      "method": "POST",
+      "priority": 90,
+      "format": "gemini",
+      "credentials": "environment-or-gateway"
+    },
+    {
+      "name": "openrouter",
+      "base": "https://openrouter.ai/api",
+      "chat_paths": ["/v1/chat/completions"],
+      "method": "POST",
+      "priority": 80,
+      "format": "openai",
+      "credentials": "environment-or-gateway"
+    },
+    {
+      "name": "groq",
+      "base": "https://api.groq.com/openai",
+      "chat_paths": ["/v1/chat/completions"],
+      "method": "POST",
+      "priority": 78,
+      "format": "openai",
+      "credentials": "environment-or-gateway"
+    },
+    {
+      "name": "huggingface",
+      "base": "https://router.huggingface.co",
+      "chat_paths": ["/v1/chat/completions"],
+      "method": "POST",
+      "priority": 76,
+      "format": "openai",
+      "credentials": "environment-or-gateway"
+    },
+    {
+      "name": "nvidia-nim",
+      "base": "https://integrate.api.nvidia.com",
+      "chat_paths": ["/v1/chat/completions"],
+      "method": "POST",
+      "priority": 74,
+      "format": "openai",
+      "credentials": "environment-or-gateway"
+    },
+    {
+      "name": "opencode-zen",
+      "base": "https://opencode.ai/zen",
+      "chat_paths": ["/v1/chat/completions"],
+      "method": "POST",
+      "priority": 72,
+      "format": "openai",
+      "credentials": "environment-or-gateway"
+    },
+    {
+      "name": "llm7",
+      "base": "https://api.llm7.io",
+      "chat_paths": ["/v1/chat/completions"],
+      "method": "POST",
+      "priority": 70,
+      "format": "openai",
+      "credentials": "environment-or-gateway"
+    },
+    {
       "name": "pollinations",
       "base": "https://gen.pollinations.ai",
       "chat_paths": ["/v1/chat/completions"],
       "method": "POST",
-      "priority": 70,
+      "priority": 68,
       "format": "openai"
     }
   ],
