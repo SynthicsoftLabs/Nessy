@@ -7,6 +7,8 @@ on:
     branches: [main, 'automation/**']
   pull_request:
     types: [opened, synchronize, reopened]
+  issues:
+    types: [opened]
   workflow_run:
     workflows:
       - Preflight
@@ -27,7 +29,7 @@ permissions:
   copilot-requests: write
 
 concurrency:
-  group: nessy-autonomous-engineer-${{ github.event.pull_request.number || github.event.workflow_run.id || github.ref_name }}
+  group: nessy-autonomous-engineer-${{ github.event.issue.number || github.event.pull_request.number || github.event.workflow_run.id || github.ref_name }}
   cancel-in-progress: true
 
 env:
@@ -73,22 +75,37 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          ISSUE_CONTEXT=''
+          if [ "${{ github.event_name }}" = "issues" ]; then
+            ISSUE_CONTEXT="$(gh issue view "${{ github.event.issue.number }}" --json number,title,body,url)"
+          fi
+          PR_CONTEXT=''
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            PR_CONTEXT="$(gh pr view "${{ github.event.pull_request.number }}" --json number,title,body,url,headRefName,baseRefName)"
+          fi
+          WORKFLOW_CONTEXT=''
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            WORKFLOW_CONTEXT="$(gh run view "${{ github.event.workflow_run.id }}" --json name,status,conclusion,headBranch,headSha,url)"
+          fi
+          export ISSUE_CONTEXT PR_CONTEXT WORKFLOW_CONTEXT
           copilot -p 'You are Nessy Autonomous Engineer operating inside SynthicsoftLabs/Nessy.
 
 Execute the complete repository engineering cycle without asking a user for input.
 
 1. Establish repository state first. Read git log --oneline --graph -n 20, README.md, AUTOMATION.md, CONTRIBUTING.md, affected files, and git blame for files you will change. Inspect the dependency graph and existing tests/workflows before editing.
-2. Determine the current trigger context with gh run list, gh run view, gh pr list, git status, git branch --show-current, git rev-parse HEAD, and repository metadata. Identify the actual failure or engineering task from evidence rather than guessing.
-3. Reproduce the defect before fixing it. For bugs, add or update the smallest regression test that proves the failure. Keep unrelated files untouched.
-4. Trace callers, dependencies, workflow consumers, and public interfaces before changing signatures or behavior. Prefer AST-aware/compiler-backed validation over regex-only reasoning.
+2. Determine the current trigger context from the exported ISSUE_CONTEXT, PR_CONTEXT, WORKFLOW_CONTEXT plus gh run list, gh run view, gh pr list, git status, git branch --show-current, git rev-parse HEAD, and repository metadata. Identify the actual engineering task from evidence rather than guessing.
+3. For an issue trigger, treat the issue body as the engineering objective. Reproduce the defect or inspect the requested change before fixing it. For observed bugs, add or update the smallest regression test that proves the failure.
+4. Trace callers, dependencies, workflow consumers, and public interfaces before changing signatures or behavior. Prefer compiler-backed and AST-aware validation over regex-only reasoning.
 5. Implement the smallest complete root-cause fix. No placeholders, TODOs, commented-out dead code, hardcoded credentials, or speculative rewrites.
 6. Run the full repository validation matrix locally in this job: cargo fmt --all -- --check; cargo check --workspace --all-targets; cargo test --workspace --all-targets; cargo clippy --workspace --all-targets --all-features -- -D warnings; cargo audit; cargo deny check; Node syntax/tests for docs/chat when present; repository integrity verification; and relevant project scripts.
 7. If validation fails, inspect the actual failure, correct the implementation, and rerun the affected gate followed by the complete validation matrix. Continue until the tree is clean or an externally unavailable capability is conclusively identified.
 8. Inspect the final diff and verify the change is atomic, idempotent, minimal, documented, and internally consistent. Confirm no merge markers, generated secrets, unexpected files, or unrelated changes exist.
 9. Use a strict Conventional Commit message. Keep one logical change per commit.
-10. Never push directly to main. For a pull request, work on its existing same-repository head branch when possible. For main/scheduled maintenance, create an automation/* branch from main.
+10. Never push directly to main. For a pull request, work on its existing same-repository head branch when possible. For main/scheduled/issue maintenance, create an automation/* branch from main.
 11. Push the branch, create or update a pull request with an evidence-based description, and enable automatic merge when the validation gates are successful. Use gh pr checks --watch when a PR exists. Merge with squash only after the complete validation cycle succeeds.
-12. After merge, verify main points at the expected commit and rerun repository integrity/readiness checks. Leave a concise execution record in the job summary.
+12. After merge, verify main points at the expected commit and rerun repository integrity/readiness checks.
+13. If this run came from an issue, post the execution result back to that issue with gh issue comment: report the task, changed commit or PR, validation result, and resulting main SHA. Do not claim success until those values have been directly verified.
+14. Leave a concise execution record in the GitHub Actions step summary.
 
 You have no human to ask. Make the engineering decisions required to complete the task from repository evidence and existing architecture. Stop only for a genuinely unavailable external capability, and record the exact blocker and attempted route in the workflow summary.' --allow-tool='shell(git:*)' --allow-tool='shell(gh:*)' --allow-tool='shell(cargo:*)' --allow-tool='shell(node:*)' --allow-tool='shell(npm:*)' --allow-tool=write --allow-tool=edit --no-ask-user
 
@@ -125,3 +142,6 @@ You have no human to ask. Make the engineering decisions required to complete th
           echo "- Branch: $(git branch --show-current)" >> "$GITHUB_STEP_SUMMARY"
           echo "- Working tree: $(git status --porcelain | wc -l) changed paths" >> "$GITHUB_STEP_SUMMARY"
           gh pr list --state open --limit 20 --json number,title,headRefName,baseRefName,isDraft,mergeStateStatus,url >> "$GITHUB_STEP_SUMMARY" || true
+          if [ "${{ github.event_name }}" = "issues" ]; then
+            echo "- Issue: #${{ github.event.issue.number }}" >> "$GITHUB_STEP_SUMMARY"
+          fi
