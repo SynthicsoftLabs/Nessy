@@ -3,6 +3,20 @@
 name: Nessy Autonomous Engineer
 
 on:
+  workflow_call:
+    inputs:
+      issue_number:
+        description: 'Repository issue driving this autonomous cycle'
+        required: false
+        type: string
+      objective:
+        description: 'Objective supplied by the autonomous control plane'
+        required: true
+        type: string
+      target_ref:
+        description: 'Repository ref the engineer must operate on'
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       issue_number:
@@ -17,10 +31,6 @@ on:
         description: 'Repository ref the engineer must operate on'
         required: true
         type: string
-  workflow_run:
-    workflows:
-      - Nessy Autonomous Control Plane
-    types: [completed]
 
 permissions:
   contents: write
@@ -37,7 +47,7 @@ env:
   RUSTFLAGS: '-D warnings'
 
 concurrency:
-  group: nessy-autonomous-engineer-${{ github.event.workflow_run.id || github.event.inputs.issue_number || github.run_id }}
+  group: nessy-autonomous-engineer-${{ github.event.inputs.issue_number || github.run_id }}
   cancel-in-progress: false
 
 jobs:
@@ -51,20 +61,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          event='${{ github.event_name }}'
-          target_ref='main'
-          issue_number=''
-          objective=''
-          case "$event" in
-            workflow_dispatch)
-              target_ref='${{ github.event.inputs.target_ref }}'
-              issue_number='${{ github.event.inputs.issue_number }}'
-              objective='${{ github.event.inputs.objective }}' ;;
-            workflow_run)
-              target_ref='${{ github.event.workflow_run.head_branch }}'
-              issue_number=''
-              objective="Execute the complete autonomous engineering cycle for control-plane run ${{ github.event.workflow_run.id }}. Control-plane conclusion=${{ github.event.workflow_run.conclusion }}, SHA=${{ github.event.workflow_run.head_sha }}, target=${{ github.event.workflow_run.head_branch }}. Inspect the exact run and repository state, repair failures or implement the selected self-development objective, validate the complete tree, and promote verified work." ;;
-          esac
+          target_ref='${{ inputs.target_ref }}'
+          issue_number='${{ inputs.issue_number }}'
+          objective='${{ inputs.objective }}'
+          if [ -z "$target_ref" ]; then target_ref='${{ github.event.inputs.target_ref }}'; fi
+          if [ -z "$issue_number" ]; then issue_number='${{ github.event.inputs.issue_number }}'; fi
+          if [ -z "$objective" ]; then objective='${{ github.event.inputs.objective }}'; fi
           if [ -z "$target_ref" ]; then target_ref='main'; fi
           if [ -z "$objective" ]; then objective='Run the complete autonomous Nessy self-development cycle from the current target ref using docs/SELF_DEVELOPMENT.md.'; fi
           if [ -z "$issue_number" ]; then
@@ -107,13 +109,6 @@ jobs:
           git log --oneline --decorate -n 20 > /tmp/nessy-history.txt
           gh run list --repo "$GH_REPO" --limit 30 --json databaseId,name,status,conclusion,headBranch,headSha,event,createdAt > /tmp/nessy-runs.json
           gh pr list --repo "$GH_REPO" --state open --limit 30 --json number,title,headRefName,baseRefName,mergeStateStatus,url > /tmp/nessy-prs.json
-          if [ '${{ github.event_name }}' = 'workflow_run' ]; then
-            printf '%s\n' '${{ github.event.workflow_run.id }}' > /tmp/nessy-control-plane-run.txt
-            printf '%s\n' '${{ github.event.workflow_run.head_sha }}' > /tmp/nessy-control-plane-sha.txt
-          else
-            : > /tmp/nessy-control-plane-run.txt
-            : > /tmp/nessy-control-plane-sha.txt
-          fi
 
       - name: Install Copilot CLI
         shell: bash
@@ -134,16 +129,14 @@ jobs:
           RUN_CONTEXT="$(cat /tmp/nessy-runs.json)"
           PR_CONTEXT="$(cat /tmp/nessy-prs.json)"
           SELF_DEVELOPMENT_CONTEXT="$(cat docs/SELF_DEVELOPMENT.md)"
-          CONTROL_PLANE_RUN="$(cat /tmp/nessy-control-plane-run.txt)"
-          CONTROL_PLANE_SHA="$(cat /tmp/nessy-control-plane-sha.txt)"
-          export ISSUE_CONTEXT ISSUE_NUMBER OBJECTIVE TARGET_REF RUN_CONTEXT PR_CONTEXT SELF_DEVELOPMENT_CONTEXT CONTROL_PLANE_RUN CONTROL_PLANE_SHA
+          export ISSUE_CONTEXT ISSUE_NUMBER OBJECTIVE TARGET_REF RUN_CONTEXT PR_CONTEXT SELF_DEVELOPMENT_CONTEXT
           copilot -p 'You are Nessy Autonomous Engineer operating inside SynthicsoftLabs/Nessy.
 
 Execute the complete repository engineering and self-development cycle without asking a human for input.
 
 Repository contract:
 - Read git log --oneline --graph -n 20, README.md, AUTOMATION.md, CONTRIBUTING.md, docs/SELF_DEVELOPMENT.md, affected source, tests, workflows, and git blame before editing.
-- Establish the exact failure or objective from machine evidence: OBJECTIVE, ISSUE_CONTEXT, RUN_CONTEXT, PR_CONTEXT, TARGET_REF, CONTROL_PLANE_RUN, CONTROL_PLANE_SHA, repository state, active PRs, workflow history, and the self-development policy.
+- Establish the exact failure or objective from machine evidence: OBJECTIVE, ISSUE_CONTEXT, RUN_CONTEXT, PR_CONTEXT, TARGET_REF, repository state, active PRs, workflow history, and the self-development policy.
 - When the cycle is proactive/self-development work, inspect the complete repository and derive the highest-value unresolved atomic objective using docs/SELF_DEVELOPMENT.md.
 - When the cycle follows a failed workflow, inspect the actual run, logs, checks, and affected repository state before editing. Repair the root cause rather than changing validation to hide the failure.
 - Research relevant repository history and current external capability/model/provider documentation when new functionality or integrations are warranted. Normalize useful discoveries into the repository registries and capability vocabulary.
