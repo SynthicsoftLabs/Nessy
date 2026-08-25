@@ -124,3 +124,46 @@ jobs:
         with:
           name: sbom
           path: sbom.cdx.json
+
+  autonomous-supervisor:
+    name: Autonomous supervisor dispatch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && always()
+    needs: [integrity, format, check, test, clippy, audit, policy, license, sbom]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      actions: write
+    steps:
+      - name: Resolve latest autonomous task
+        id: task
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          issue_number=$(gh issue list --state open --limit 20 --json number,title --jq '[.[] | select(.title | startswith("Autonomous")) | .number] | .[-1] // empty')
+          if [ -z "$issue_number" ]; then
+            echo 'No open autonomous task found.'
+            exit 0
+          fi
+          echo "issue_number=$issue_number" >> "$GITHUB_OUTPUT"
+
+      - name: Record CI supervisor receipt
+        if: steps.task.outputs.issue_number != ''
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ steps.task.outputs.issue_number }}
+        run: |
+          set -euo pipefail
+          gh issue comment "$ISSUE_NUMBER" --body "Nessy CI autonomous supervisor received the current main validation event and is dispatching the repository engineering worker."
+
+      - name: Dispatch autonomous supervisor
+        if: steps.task.outputs.issue_number != ''
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run nessy-autonomous-supervisor.yml --ref main
