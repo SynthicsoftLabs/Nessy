@@ -2,11 +2,11 @@
 
 # 🧠 Nessy AGI & Frontier Capability Matrix
 
-## ◈ Purpose
+## Purpose
 
-Nessy converts frontier AI and AGI research into executable, composable platform capabilities. The capability graph is the common language between models, runtimes, tools, memory, research systems, execution environments, and autonomous workflows.
+Nessy converts research into executable, composable capabilities. The capability graph is the common language between models, runtimes, tools, memory, research systems, execution environments, and autonomous workflows.
 
-## Capability Domains
+## Capability domains
 
 | Domain | Capability surface |
 |:--|:--|
@@ -23,12 +23,13 @@ Nessy converts frontier AI and AGI research into executable, composable platform
 | **Interaction** | realtime voice, streaming, structured output, function calling, MCP, connectors, notifications |
 | **Scientific** | symbolic math, numerical computation, simulation, data analysis, model discovery, experiments |
 | **Security** | code audit, dependency analysis, threat modeling, secret detection, policy evaluation, telemetry |
-| **Infrastructure** | distributed scheduling, peer discovery, failover, checkpointing, replication, content addressing, workload migration |
+| **Infrastructure** | scheduling, peer discovery, failover, checkpointing, replication, content addressing, workload migration |
 | **Governance** | provenance, attribution, licensing metadata, audit trails, reproducible builds, artifact signing |
+| **Autonomous Engineering** | issue ingestion, failure diagnosis, regression testing, repair, validation, atomic commits, PR promotion, post-merge verification |
 
-## 🌐 Frontier Coverage
+## Frontier research coverage
 
-Nessy maintains normalized capability coverage for the named frontier systems and expands the registry as additional systems are researched:
+Nessy maintains normalized research coverage for the project-defined frontier systems and expands the registry as additional systems are studied.
 
 | System | Capability areas represented |
 |:--|:--|
@@ -43,15 +44,15 @@ Nessy maintains normalized capability coverage for the named frontier systems an
 | **Z.ai / GLM** | reasoning, coding, tools, multimodality, agent workflows |
 | **Gemma** | reasoning, multimodality, long context, function calling, deployable inference |
 
-## 🔭 Continuous Frontier Expansion
+The registry is intentionally extensible across additional model and provider families.
 
-The registry is intentionally broader than the initial named set. Research additions are normalized into the same contract vocabulary across:
+## Free/open model fabric
 
-**OpenAI · Anthropic · Meta · Mistral · DeepSeek · xAI · Google · Alibaba · ByteDance · Moonshot AI · Z.ai · Perplexity · AI21 · Cohere · NVIDIA · Microsoft · Amazon · IBM · Hugging Face · Stability AI · Runway · Luma · Black Forest Labs · ElevenLabs · Open-source and research models**
+`docs/models/free-models.json` is the machine-readable free/open discovery registry. Its initial source is the public [`12britz/awesome-free-models`](https://github.com/12britz/awesome-free-models) catalog, whose current organization includes open-weight models, free API providers, image/video generation, routers, local runtimes, chat UIs, audio/speech, coding assistants, code models, embeddings, RAG/vector databases, agentic frameworks, MCP tools, fine-tuning, prompt engineering, evaluation/observability, datasets, model hosting, learning resources, and discovery/community resources. citeturn219762view4
 
-The provider registry is designed to add additional model families, agent frameworks, modalities, tools, memory systems, inference techniques, and research capabilities without changing the core orchestration model.
+Catalog metadata includes roles such as reasoning, coding, multimodal, local inference, routing, and evaluation. Provider records should preserve access/credential requirements and licensing information. The existence of a catalog entry is not itself a guarantee of direct browser access or permanent free availability.
 
-## ⚙️ Capability Contract
+## Capability contract
 
 Each registered capability exposes:
 
@@ -73,7 +74,7 @@ evaluation suite
 provenance
 ```
 
-## 🧩 Composition
+## Composition
 
 ```text
                  TASK / GOAL
@@ -104,46 +105,64 @@ provenance
                      └──────────► NEXT TASK
 ```
 
-## 🧠 AGI Runtime Graph
+## Autonomous engineering graph
 
 ```text
-                    ┌───────────────┐
-                    │ WORLD / INPUT │
-                    └───────┬───────┘
-                            ▼
-                    ┌───────────────┐
-                    │ PERCEPTION    │
-                    └───────┬───────┘
-                            ▼
-              ┌─────────────┴─────────────┐
-              ▼                           ▼
-        MEMORY GRAPH                 KNOWLEDGE GRAPH
-              │                           │
-              └─────────────┬─────────────┘
-                            ▼
-                    ┌───────────────┐
-                    │ REASON / PLAN │
-                    └───────┬───────┘
-                            ▼
-                    ┌───────────────┐
-                    │ ACT / DELEGATE│
-                    └───────┬───────┘
-                            ▼
-                    ┌───────────────┐
-                    │ OBSERVE RESULT│
-                    └───────┬───────┘
-                            ▼
-                    ┌───────────────┐
-                    │ EVALUATE      │
-                    └───────┬───────┘
-                            ▼
-                    ┌───────────────┐
-                    │ LEARN / STORE │
-                    └───────┬───────┘
-                            └──────────────► CONTINUOUS DISCOVERY
+                   EVENT / FAILURE
+                         │
+                         ▼
+                 CONTROL PLANE
+                         │
+                         ▼
+                   ENGINEER WORKER
+                         │
+          ┌──────────────┼──────────────┐
+          ▼              ▼              ▼
+      REPRODUCE      REGRESSION      CONTEXT
+          │            COVERAGE       ANALYSIS
+          └──────────────┬──────────────┘
+                         ▼
+                    ROOT-CAUSE FIX
+                         │
+                         ▼
+                  FULL VALIDATION
+                         │
+                         ▼
+                    ATOMIC COMMIT
+                         │
+                         ▼
+                         PR
+                         │
+                         ▼
+                     PROMOTE
+                         │
+                         ▼
+                    VERIFY MAIN
 ```
 
-## 🔬 Research-to-Runtime Pipeline
+## AGI runtime graph
+
+```text
+WORLD / INPUT
+     ↓
+PERCEPTION
+     ↓
+MEMORY GRAPH ↔ KNOWLEDGE GRAPH
+     ↓
+REASON / PLAN
+     ↓
+ACT / DELEGATE / CREATE
+     ↓
+OBSERVE RESULT
+     ↓
+EVALUATE
+     ↓
+LEARN / STORE / CONSOLIDATE
+     ↓
+CONTINUOUS DISCOVERY
+```
+
+## Research-to-runtime methodology
 
 ```text
 RESEARCH
@@ -154,7 +173,7 @@ DEFINE NORMALIZED CAPABILITY
    ↓
 IMPLEMENT ADAPTER
    ↓
-ADD EVALUATION
+ADD TESTS / EVALUATION
    ↓
 ADD TELEMETRY
    ↓
@@ -165,8 +184,10 @@ REGISTER IN CAPABILITY GRAPH
 COMPOSE WITH EXISTING CAPABILITIES
    ↓
 DEPLOY THROUGH AUTONOMOUS RUNTIME
+   ↓
+OBSERVE / LEARN / UPDATE
 ```
 
-## ✦ Source of Truth
+## Source of truth
 
-The executable capability graph lives in `crates/capability/src/agi.rs`. This document describes its capability vocabulary and frontier coverage. New research should update both the registry and this matrix so documentation and implementation remain synchronized.
+The executable capability graph lives in `crates/capability/src/agi.rs`. Runtime/provider routing lives in `docs/chat/runtime.json`. Free/open model discovery lives in `docs/models/free-models.json`. This matrix describes the capability vocabulary and research coverage; implementation changes must keep those machine-readable registries and canonical documentation synchronized.
