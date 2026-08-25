@@ -14,6 +14,7 @@ Nessy documentation is organized around one implementation: the BowserAI autonom
 | [`../SECURITY.md`](../SECURITY.md) | Identity, execution, network, MCP, state, secrets, supply chain, integrity, and recovery |
 | [`../CONTRIBUTING.md`](../CONTRIBUTING.md) | Repository engineering standards and automated change lifecycle |
 | [`AGI_CAPABILITY_MATRIX.md`](AGI_CAPABILITY_MATRIX.md) | Capability vocabulary, frontier coverage, and research-to-runtime methodology |
+| [`DOCUMENTATION_COVERAGE.md`](DOCUMENTATION_COVERAGE.md) | Documentation completeness map and synchronization rule |
 | [`chat/index.html`](chat/index.html) | Repository-native chat surface |
 | [`chat/app.js`](chat/app.js) | Chat controller and runtime/session behavior |
 | [`chat/runtime.json`](chat/runtime.json) | Machine-readable runtime/provider routing registry |
@@ -22,67 +23,26 @@ Nessy documentation is organized around one implementation: the BowserAI autonom
 ## System lifecycle
 
 ```text
-DISCOVER
-   ↓
-REGISTER
-   ↓
-NORMALIZE
-   ↓
-MATCH
-   ↓
-COMPOSE
-   ↓
-ROUTE
-   ↓
-EXECUTE
-   ↓
-OBSERVE
-   ↓
-EVALUATE
-   ↓
-MEMORY / SKILL UPDATE
-   ↓
-RECOVER OR CONTINUE
-   ↓
-DISCOVER
+DISCOVER → REGISTER → NORMALIZE → MATCH → COMPOSE → ROUTE → EXECUTE
+    ▲                                                       │
+    │                                                       ▼
+    └──────── RECOVER ← CHECKPOINT ← EVALUATE ← OBSERVE ←──┘
 ```
 
 ## Autonomous engineering lifecycle
 
 ```text
-EVENT
-  ↓
-CONTROL PLANE
-  ↓
-ENGINEER WORKER
-  ↓
-REPRODUCE
-  ↓
-REGRESSION TEST
-  ↓
-ROOT-CAUSE FIX
-  ↓
-FULL VALIDATION
-  ↓
-ATOMIC COMMIT
-  ↓
-AUTOMATION BRANCH
-  ↓
-PULL REQUEST
-  ↓
-AUTOMATED PROMOTION
-  ↓
-POST-MERGE VERIFICATION
+EVENT → CONTROL PLANE → ENGINEER → REPRODUCE → TEST → FIX → VALIDATE
+                                                     ↓
+                           COMMIT → PR → PROMOTE → VERIFY MAIN
 ```
 
-The repository is designed so normal engineering operation does not depend on an operator manually reproducing this sequence.
+The repository is designed so routine engineering operation proceeds from repository state and machine-readable evidence rather than an operator-driven setup sequence.
 
 ## Documentation synchronization
 
-Executable behavior is authoritative. Documentation describes the behavior implemented in the repository and should be updated in the same logical change when architecture, interfaces, runtime routing, capability vocabulary, or operational workflow changes.
-
-The machine-readable registries under `docs/` are source data for discovery and routing; they do not imply that every provider is directly browser-callable, permanently free, or anonymously accessible. Provider metadata records the relevant access and licensing fields so routing can make an informed selection.
+Executable behavior is authoritative. Documentation is updated with architecture, interface, runtime, capability, provider, data-format, and operational-lifecycle changes. Machine-readable registries are source data for routing and discovery; they do not assert that every provider is browser-callable, permanently free, or anonymously accessible.
 
 ## Legal and attribution
 
-BowserAI / Nessy was created by Adam Joseph Rivers, CEO of Synthicsoft Labs LLC. The project is licensed under Apache License 2.0. See [`../NOTICE`](../NOTICE) and [`../LICENSE`](../LICENSE) for attribution and licensing terms.
+BowserAI / Nessy was created by **Adam Joseph Rivers, CEO of Synthicsoft Labs LLC**. The project is licensed under the Apache License, Version 2.0. See [`../NOTICE`](../NOTICE) and [`../LICENSE`](../LICENSE).
