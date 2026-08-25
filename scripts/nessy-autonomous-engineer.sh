@@ -29,7 +29,6 @@ if [[ -n "$OPEN_PR" ]]; then
   exit 0
 fi
 
-# Serialize branch ownership across retries and previous experiments.
 git fetch origin main --prune
 REMOTE_MAIN="$(git rev-parse origin/main)"
 if [[ "$REMOTE_MAIN" != "$START_SHA" ]]; then
@@ -200,8 +199,6 @@ if [[ "$ENGINE_SUCCESS" -eq 0 ]]; then
   exit 1
 fi
 
-# Deterministic pre-commit validation. Do not call immutable-tree verification here: the
-# working tree is intentionally dirty until the autonomous change is committed.
 git diff --check
 cargo fmt --all -- --check
 cargo check --workspace --all-targets
@@ -215,13 +212,13 @@ cargo deny check
 [ ! -f tests/chat-response-quality.test.js ] || node tests/chat-response-quality.test.js
 [ ! -f tests/chat-engineering.test.js ] || node tests/chat-engineering.test.js
 [ ! -f tests/chat-model-routing.test.js ] || node tests/chat-model-routing.test.js
+[ ! -f tests/autonomous-provider-fallback.test.sh ] || bash tests/autonomous-provider-fallback.test.sh
 
 if [[ -z "$(git status --porcelain)" ]]; then
   echo "Autonomous cycle produced no repository changes."
   exit 0
 fi
 
-# Reconcile against the latest main before the sole commit.
 git fetch origin main --prune
 LATEST_MAIN="$(git rev-parse origin/main)"
 CURRENT_BASE="$(git merge-base HEAD origin/main)"
@@ -243,7 +240,6 @@ if [[ -z "$PR_NUMBER" ]]; then
   PR_NUMBER="${PR_URL##*/}"
 fi
 
-# Automatic promotion; branch deletion is safe after merge and prevents accumulation.
 gh pr merge "$PR_NUMBER" --repo "$GH_REPO" --auto --squash --delete-branch || \
 gh pr merge "$PR_NUMBER" --repo "$GH_REPO" --squash --delete-branch
 
@@ -253,7 +249,6 @@ if [[ -z "$PROMOTED_SHA" ]]; then
   exit 1
 fi
 
-# Immutable-state verification belongs after the commit is pushed, when the working tree is clean.
 GITHUB_SHA="$PROMOTED_SHA" GITHUB_REF_NAME="main" GITHUB_EVENT_NAME="push" GITHUB_REPOSITORY="$GH_REPO" bash scripts/verify-interposition.sh
 
 if [[ -n "$ISSUE_NUMBER" ]]; then
