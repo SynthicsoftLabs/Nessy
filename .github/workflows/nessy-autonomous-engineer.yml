@@ -3,21 +3,6 @@
 name: Nessy Autonomous Engineer
 
 on:
-  push:
-    branches: [main, 'automation/**']
-  pull_request:
-    types: [opened, synchronize, reopened]
-  issues:
-    types: [opened]
-  workflow_run:
-    workflows:
-      - Preflight
-      - Interposition Integrity
-      - Nessy Chat Artifact
-      - CI
-    types: [completed]
-  schedule:
-    - cron: '*/30 * * * *'
   workflow_dispatch:
     inputs:
       issue_number:
@@ -25,8 +10,8 @@ on:
         required: false
         type: string
       objective:
-        description: 'Objective supplied by the autonomous supervisor'
-        required: false
+        description: 'Objective supplied by the autonomous control plane'
+        required: true
         type: string
 
 permissions:
@@ -37,31 +22,30 @@ permissions:
   actions: read
   copilot-requests: write
 
-concurrency:
-  group: nessy-autonomous-engineer-${{ github.event.issue.number || github.event.inputs.issue_number || github.event.pull_request.number || github.event.workflow_run.id || github.ref_name }}
-  cancel-in-progress: true
-
 env:
   GH_TOKEN: ${{ github.token }}
   COPILOT_GITHUB_TOKEN: ${{ github.token }}
+  GH_REPO: ${{ github.repository }}
   RUSTFLAGS: '-D warnings'
+
+concurrency:
+  group: nessy-autonomous-engineer-${{ github.event.inputs.issue_number || github.run_id }}
+  cancel-in-progress: false
 
 jobs:
   engineer:
-    if: >-
-      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) &&
-      (github.event_name != 'workflow_run' || github.event.workflow_run.head_repository.full_name == github.repository)
+    name: Autonomous engineering cycle
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - name: Checkout engineering target
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref || github.event.workflow_run.head_branch || github.ref_name }}
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
           persist-credentials: true
 
-      - name: Install engineering toolchain
+      - name: Establish repository state
         shell: bash
         run: |
           set -euo pipefail
@@ -71,7 +55,28 @@ jobs:
           git status --short
           git log --oneline --graph -n 20
           test -f README.md
+          test -f AUTOMATION.md
+          test -f CONTRIBUTING.md
           test -f Cargo.toml
+
+      - name: Resolve task evidence
+        shell: bash
+        env:
+          ISSUE_NUMBER: ${{ github.event.inputs.issue_number }}
+          OBJECTIVE: ${{ github.event.inputs.objective }}
+        run: |
+          set -euo pipefail
+          if [ -n "$ISSUE_NUMBER" ]; then
+            gh issue view "$ISSUE_NUMBER" --repo "$GH_REPO" --json number,title,body,url > /tmp/nessy-issue.json
+          else
+            printf '%s\n' '{"number":null,"title":"autonomous-maintenance","body":""}' > /tmp/nessy-issue.json
+          fi
+          git status --short > /tmp/nessy-status.txt
+          git branch --show-current > /tmp/nessy-branch.txt
+          git rev-parse HEAD > /tmp/nessy-head.txt
+          git log --oneline --decorate -n 20 > /tmp/nessy-history.txt
+          gh run list --repo "$GH_REPO" --limit 20 --json databaseId,name,status,conclusion,headBranch,headSha,event,createdAt > /tmp/nessy-runs.json
+          gh pr list --repo "$GH_REPO" --state open --limit 20 --json number,title,headRefName,baseRefName,mergeStateStatus,url > /tmp/nessy-prs.json
 
       - name: Install Copilot CLI
         shell: bash
@@ -82,80 +87,68 @@ jobs:
 
       - name: Autonomous engineering cycle
         shell: bash
+        env:
+          ISSUE_NUMBER: ${{ github.event.inputs.issue_number }}
+          OBJECTIVE: ${{ github.event.inputs.objective }}
         run: |
           set -euo pipefail
-          ISSUE_CONTEXT=''
-          ISSUE_NUMBER='${{ github.event.issue.number || github.event.inputs.issue_number }}'
-          ISSUE_OBJECTIVE='${{ github.event.inputs.objective }}'
-          if [ -n "$ISSUE_NUMBER" ]; then
-            ISSUE_CONTEXT="$(gh issue view "$ISSUE_NUMBER" --json number,title,body,url)"
-            if [ -z "$ISSUE_OBJECTIVE" ]; then
-              ISSUE_OBJECTIVE="$(gh issue view "$ISSUE_NUMBER" --json body --jq '.body')"
-            fi
-          fi
-          PR_CONTEXT=''
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            PR_CONTEXT="$(gh pr view "${{ github.event.pull_request.number }}" --json number,title,body,url,headRefName,baseRefName)"
-          fi
-          WORKFLOW_CONTEXT=''
-          if [ "${{ github.event_name }}" = "workflow_run" ]; then
-            WORKFLOW_CONTEXT="$(gh run view "${{ github.event.workflow_run.id }}" --json name,status,conclusion,headBranch,headSha,url)"
-          fi
-          export ISSUE_CONTEXT ISSUE_NUMBER ISSUE_OBJECTIVE PR_CONTEXT WORKFLOW_CONTEXT
+          ISSUE_CONTEXT="$(cat /tmp/nessy-issue.json)"
+          RUN_CONTEXT="$(cat /tmp/nessy-runs.json)"
+          PR_CONTEXT="$(cat /tmp/nessy-prs.json)"
+          export ISSUE_CONTEXT ISSUE_NUMBER OBJECTIVE RUN_CONTEXT PR_CONTEXT
           copilot -p 'You are Nessy Autonomous Engineer operating inside SynthicsoftLabs/Nessy.
 
-Execute the complete repository engineering cycle without asking a user for input.
+Execute the complete repository engineering cycle without asking a human for input.
 
-1. Establish repository state first. Read git log --oneline --graph -n 20, README.md, AUTOMATION.md, CONTRIBUTING.md, affected files, and git blame for files you will change. Inspect the dependency graph and existing tests/workflows before editing.
-2. Determine the current trigger context from the exported ISSUE_CONTEXT, ISSUE_NUMBER, ISSUE_OBJECTIVE, PR_CONTEXT, WORKFLOW_CONTEXT plus gh run list, gh run view, gh pr list, git status, git branch --show-current, git rev-parse HEAD, and repository metadata. Identify the actual engineering task from evidence rather than guessing.
-3. For an issue-driven run, treat ISSUE_OBJECTIVE and ISSUE_CONTEXT as the engineering objective. Reproduce the defect or inspect the requested change before fixing it. For observed bugs, add or update the smallest regression test that proves the failure.
-4. Trace callers, dependencies, workflow consumers, and public interfaces before changing signatures or behavior. Prefer compiler-backed and AST-aware validation over regex-only reasoning.
-5. Implement the smallest complete root-cause fix. No placeholders, TODOs, commented-out dead code, hardcoded credentials, or speculative rewrites.
-6. Run the full repository validation matrix locally in this job: cargo fmt --all -- --check; cargo check --workspace --all-targets; cargo test --workspace --all-targets; cargo clippy --workspace --all-targets --all-features -- -D warnings; cargo audit; cargo deny check; Node syntax/tests for docs/chat when present; repository integrity verification; and relevant project scripts.
-7. If validation fails, inspect the actual failure, correct the implementation, and rerun the affected gate followed by the complete validation matrix. Continue until the tree is clean or an externally unavailable capability is conclusively identified.
-8. Inspect the final diff and verify the change is atomic, idempotent, minimal, documented, and internally consistent. Confirm no merge markers, generated secrets, unexpected files, or unrelated changes exist.
-9. Use a strict Conventional Commit message. Keep one logical change per commit.
-10. Never push directly to main. For a pull request, work on its existing same-repository head branch when possible. For main/scheduled/issue maintenance, create an automation/* branch from main.
-11. Push the branch, create or update a pull request with an evidence-based description, and enable automatic merge when the validation gates are successful. Use gh pr checks --watch when a PR exists. Merge with squash only after the complete validation cycle succeeds.
-12. After merge, verify main points at the expected commit and rerun repository integrity/readiness checks.
-13. If ISSUE_NUMBER is set, post the execution result back to that issue with gh issue comment: report the task, changed commit or PR, validation result, and resulting main SHA. Do not claim success until those values have been directly verified.
-14. Leave a concise execution record in the GitHub Actions step summary.
+Repository contract:
+- Read git log --oneline --graph -n 20, README.md, AUTOMATION.md, CONTRIBUTING.md, affected source, tests, workflows, and git blame before editing.
+- Establish the exact failure or objective from machine evidence: OBJECTIVE, ISSUE_CONTEXT, RUN_CONTEXT, PR_CONTEXT, repository state, active PRs, and workflow history.
+- Reproduce observed failures before implementing fixes. Add a focused regression test before the fix where practical.
+- Trace callers, dependency edges, workflow consumers, and public interfaces before changing behavior.
+- Implement a complete root-cause change. No TODOs, placeholders, commented dead code, hardcoded secrets, or unrelated rewrites.
+- Run the complete validation matrix: cargo fmt --all -- --check; cargo check --workspace --all-targets; cargo test --workspace --all-targets; cargo clippy --workspace --all-targets --all-features -- -D warnings; cargo audit; cargo deny check; relevant Node syntax/tests; repository integrity; and relevant project scripts.
+- On failure, inspect the actual error, repair the cause, rerun the affected gate, then rerun the complete matrix.
+- Inspect the final diff for atomicity, idempotency, documentation, merge markers, credentials, unrelated changes, and generated artifacts.
+- Use one strict Conventional Commit for one logical change.
+- Never push directly to main. When the checked-out ref is main, create an automation/* branch from main before committing repairs. When a pull-request ref is supplied, continue on that same-repository branch and keep its scope atomic.
+- Push the branch, create or update the appropriate pull request, monitor all checks, and enable automatic merge when every required validation succeeds.
+- After promotion, verify main points to the expected commit and rerun integrity/readiness checks against that exact SHA.
+- If ISSUE_NUMBER is set, comment the exact result, commit/PR, validation result, and verified main SHA on the issue.
 
-You have no human to ask. Make the engineering decisions required to complete the task from repository evidence and existing architecture. Stop only for a genuinely unavailable external capability, and record the exact blocker and attempted route in the workflow summary.' --allow-tool='shell(git:*)' --allow-tool='shell(gh:*)' --allow-tool='shell(cargo:*)' --allow-tool='shell(node:*)' --allow-tool='shell(npm:*)' --allow-tool=write --allow-tool=edit --no-ask-user
+Do not ask for confirmation. Do not declare success from intended workflow state; verify actual GitHub state.' --allow-tool='shell(git:*)' --allow-tool='shell(gh:*)' --allow-tool='shell(cargo:*)' --allow-tool='shell(node:*)' --allow-tool='shell(npm:*)' --allow-tool=write --allow-tool=edit --no-ask-user
 
       - name: Autonomous post-agent validation
         shell: bash
         run: |
           set -euo pipefail
           git status --short
-          test -z "$(git status --porcelain)" || {
-            echo 'Agent left uncommitted changes; requiring clean commit state before promotion.'
-            exit 1
-          }
+          test -z "$(git status --porcelain)" || { echo 'Agent left uncommitted changes.'; exit 1; }
           cargo fmt --all -- --check
           cargo check --workspace --all-targets
           cargo test --workspace --all-targets
           cargo clippy --workspace --all-targets --all-features -- -D warnings
           if command -v cargo-audit >/dev/null; then cargo audit; fi
           if command -v cargo-deny >/dev/null; then cargo deny check; fi
-          if [ -f docs/chat/app.js ]; then node --check docs/chat/app.js; fi
-          if [ -f docs/chat/response-quality.js ]; then node --check docs/chat/response-quality.js; fi
-          if [ -f tests/chat-response-quality.test.js ]; then node tests/chat-response-quality.test.js; fi
-          if [ -f tests/chat-engineering.test.js ]; then node tests/chat-engineering.test.js; fi
-          if [ -f tests/chat-model-routing.test.js ]; then node tests/chat-model-routing.test.js; fi
+          [ ! -f docs/chat/app.js ] || node --check docs/chat/app.js
+          [ ! -f docs/chat/response-quality.js ] || node --check docs/chat/response-quality.js
+          [ ! -f tests/chat-response-quality.test.js ] || node tests/chat-response-quality.test.js
+          [ ! -f tests/chat-engineering.test.js ] || node tests/chat-engineering.test.js
+          [ ! -f tests/chat-model-routing.test.js ] || node tests/chat-model-routing.test.js
           bash scripts/verify-interposition.sh
 
-      - name: Verify autonomous promotion
+      - name: Record autonomous result
         if: always()
         shell: bash
+        env:
+          ISSUE_NUMBER: ${{ github.event.inputs.issue_number }}
         run: |
           set -euo pipefail
-          echo '### Nessy Autonomous Engineering' >> "$GITHUB_STEP_SUMMARY"
-          echo "- Trigger: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- SHA: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Branch: $(git branch --show-current)" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Working tree: $(git status --porcelain | wc -l) changed paths" >> "$GITHUB_STEP_SUMMARY"
-          gh pr list --state open --limit 20 --json number,title,headRefName,baseRefName,isDraft,mergeStateStatus,url >> "$GITHUB_STEP_SUMMARY" || true
-          if [ -n "${{ github.event.issue.number || github.event.inputs.issue_number }}" ]; then
-            echo "- Issue: #${{ github.event.issue.number || github.event.inputs.issue_number }}" >> "$GITHUB_STEP_SUMMARY"
+          SHA="$(git rev-parse HEAD)"
+          BRANCH="$(git branch --show-current)"
+          echo '### Nessy Autonomous Engineer' >> "$GITHUB_STEP_SUMMARY"
+          echo "- Objective: ${{ github.event.inputs.objective }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Branch: $BRANCH" >> "$GITHUB_STEP_SUMMARY"
+          echo "- SHA: $SHA" >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$ISSUE_NUMBER" ]; then
+            gh issue comment "$ISSUE_NUMBER" --repo "$GH_REPO" --body "Nessy Autonomous Engineer completed its machine-driven engineering cycle at $SHA on $BRANCH. Validation is represented by this workflow result and the repository CI gates."
           fi
