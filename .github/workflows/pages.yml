@@ -44,6 +44,7 @@ jobs:
           test -s docs/chat/runtime.json
           test -s tests/chat-response-quality.test.js
           test -s tests/chat-engineering.test.js
+          test -s tests/chat-model-routing.test.js
           grep -q '<html' docs/chat/index.html
           grep -q 'src="./response-quality.js"' docs/chat/index.html
           grep -q 'src="./app.js"' docs/chat/index.html
@@ -53,6 +54,7 @@ jobs:
           node --check docs/chat/response-quality.js
           node tests/chat-response-quality.test.js
           node tests/chat-engineering.test.js
+          node tests/chat-model-routing.test.js
           python3 - <<'PY'
           import json
           from pathlib import Path
