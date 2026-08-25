@@ -1,0 +1,54 @@
+# Copyright 2026 Synthicsoft Labs LLC
+# Licensed under the Apache License, Version 2.0.
+name: Preflight
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  preflight:
+    name: Complete preflight validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify exact checkout
+        run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt,clippy
+      - name: Verify metadata and project licensing
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo metadata --format-version 1 > /tmp/metadata.json
+          python3 - <<'PY'
+          import json
+          with open('/tmp/metadata.json', encoding='utf-8') as f:
+              data = json.load(f)
+          packages = data.get('packages', [])
+          assert packages, 'workspace metadata contains no packages'
+          bad = [(p['name'], p.get('license')) for p in packages if p.get('license') != 'Apache-2.0']
+          assert not bad, f'non-Apache project package licenses: {bad}'
+          PY
+      - name: Verify no unresolved merge markers
+        shell: bash
+        run: '! grep -RInE "^(<<<<<<<|=======|>>>>>>>)" --exclude-dir=.git .'
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Check
+        run: cargo check --workspace --all-targets
+      - name: Test
+        run: cargo test --workspace --all-targets
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+      - name: Dependency audit
+        uses: actions-rust-lang/audit@v1
+      - name: License and advisory policy
+        uses: EmbarkStudios/cargo-deny-action@v2
