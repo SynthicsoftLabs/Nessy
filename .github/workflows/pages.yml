@@ -4,9 +4,10 @@ name: Nessy Chat Artifact
 
 on:
   push:
-    branches: [main]
+    branches: [main, fix/chat-engineering-process]
     paths:
       - 'docs/chat/**'
+      - 'tests/chat-*.test.js'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -33,25 +34,40 @@ jobs:
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
 
-      - name: Validate chat surface
+      - name: Validate executable chat surface
         shell: bash
         run: |
           set -euo pipefail
           test -s docs/chat/index.html
           test -s docs/chat/app.js
+          test -s docs/chat/response-quality.js
           test -s docs/chat/runtime.json
+          test -s tests/chat-response-quality.test.js
+          test -s tests/chat-engineering.test.js
+          test -s tests/chat-model-routing.test.js
           grep -q '<html' docs/chat/index.html
+          grep -q 'src="./response-quality.js"' docs/chat/index.html
           grep -q 'src="./app.js"' docs/chat/index.html
           grep -q 'BowserAI' docs/chat/index.html
           grep -q 'Nessy' docs/chat/app.js
           node --check docs/chat/app.js
+          node --check docs/chat/response-quality.js
+          node tests/chat-response-quality.test.js
+          node tests/chat-engineering.test.js
+          node tests/chat-model-routing.test.js
           python3 - <<'PY'
           import json
           from pathlib import Path
           data = json.loads(Path('docs/chat/runtime.json').read_text())
           assert isinstance(data, dict)
           assert isinstance(data.get('runtimes'), list)
-          assert isinstance(data.get('browser'), dict)
+          browser = data.get('browser')
+          assert isinstance(browser, dict)
+          models = browser.get('models')
+          assert isinstance(models, list) and models
+          assert models[0]['model'] == 'HuggingFaceTB/SmolLM2-1.7B-Instruct'
+          assert any(x['model'] == 'HuggingFaceTB/SmolLM2-360M-Instruct' for x in models)
+          assert any(x['model'] == 'HuggingFaceTB/SmolLM2-135M-Instruct' for x in models)
           PY
 
       - name: Verify runtime graph consistency
@@ -60,8 +76,10 @@ jobs:
           set -euo pipefail
           grep -q 'the-real-kairos.com' docs/chat/app.js
           grep -q 'gen.pollinations.ai' docs/chat/app.js
+          grep -q 'HuggingFaceTB/SmolLM2-1.7B-Instruct' docs/chat/app.js
           grep -q 'HuggingFaceTB/SmolLM2-360M-Instruct' docs/chat/app.js
           grep -q 'HuggingFaceTB/SmolLM2-135M-Instruct' docs/chat/app.js
+          grep -q 'NessyResponseQuality' docs/chat/app.js
 
       - name: Package chat surface
         shell: bash
@@ -69,6 +87,7 @@ jobs:
           set -euo pipefail
           mkdir -p dist
           cp -a docs/chat/. dist/
+          cp tests/chat-*.test.js dist/
           printf '%s\n' "$GITHUB_SHA" > dist/SOURCE_SHA
 
       - name: Publish chat artifact

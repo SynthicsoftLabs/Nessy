@@ -1,12 +1,12 @@
 {
-  "version": 6,
+  "version": 7,
   "project": "BowserAI/Nessy",
   "discovery": {
     "strategy": "embedded-first",
     "configuration": "repository",
     "manual_endpoint_required": false,
     "embedded_manifest_fallback": true,
-    "failover": "browser-first-with-remote-failover",
+    "failover": "remote-first-with-browser-inference-fallback",
     "manifest_timeout_ms": 6000,
     "runtime_timeout_ms": 8000
   },
@@ -31,8 +31,9 @@
   "browser": {
     "engine": "transformers-js",
     "models": [
-      {"name": "SmolLM2-360M-Instruct", "model": "HuggingFaceTB/SmolLM2-360M-Instruct", "dtype": "q4"},
-      {"name": "SmolLM2-135M-Instruct", "model": "HuggingFaceTB/SmolLM2-135M-Instruct", "dtype": "q4"}
+      {"name": "SmolLM2-1.7B-Instruct", "model": "HuggingFaceTB/SmolLM2-1.7B-Instruct", "dtype": "q4", "priority": 100},
+      {"name": "SmolLM2-360M-Instruct", "model": "HuggingFaceTB/SmolLM2-360M-Instruct", "dtype": "q4", "priority": 80},
+      {"name": "SmolLM2-135M-Instruct", "model": "HuggingFaceTB/SmolLM2-135M-Instruct", "dtype": "q4", "priority": 60}
     ],
     "cdn": "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1"
   },
