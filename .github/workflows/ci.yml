@@ -167,3 +167,98 @@ jobs:
         run: |
           set -euo pipefail
           gh workflow run nessy-autonomous-supervisor.yml --ref main
+
+  autonomous-pr-verifier:
+    name: Autonomous PR verification
+    if: >-
+      github.event_name == 'pull_request' &&
+      (github.event.action == 'opened' || github.event.action == 'reopened') &&
+      startsWith(github.head_ref, 'automation/') &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      actions: write
+      pull-requests: write
+    steps:
+      - name: Resolve autonomous task
+        id: task
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          issue_number=$(gh issue list --state open --limit 20 --json number,title --jq '[.[] | select(.title | startswith("Autonomous")) | .[-1]] | .[0].number // empty')
+          if [ -z "$issue_number" ]; then
+            echo 'No open autonomous task found.'
+            exit 0
+          fi
+          echo "issue_number=$issue_number" >> "$GITHUB_OUTPUT"
+
+      - name: Record PR verifier receipt
+        if: steps.task.outputs.issue_number != ''
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ steps.task.outputs.issue_number }}
+        run: |
+          set -euo pipefail
+          gh issue comment "$ISSUE_NUMBER" --body "Nessy CI autonomous PR verifier accepted automation/${{ github.event.pull_request.number }} and is dispatching the engineering worker against the PR branch."
+
+      - name: Dispatch autonomous engineer on PR branch
+        if: steps.task.outputs.issue_number != ''
+        id: dispatch
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ steps.task.outputs.issue_number }}
+          PR_BRANCH: ${{ github.head_ref }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -euo pipefail
+          gh workflow run nessy-autonomous-engineer.yml \
+            --ref "$PR_BRANCH" \
+            -f issue_number="$ISSUE_NUMBER" \
+            -f objective="$PR_BODY"
+
+          for attempt in $(seq 1 30); do
+            RUN_ID=$(gh run list \
+              --workflow nessy-autonomous-engineer.yml \
+              --event workflow_dispatch \
+              --limit 20 \
+              --json databaseId,createdAt,headBranch \
+              --jq 'map(select(.headBranch == "'"$PR_BRANCH"'")) | sort_by(.createdAt) | last | .databaseId // empty')
+            if [ -n "$RUN_ID" ]; then
+              echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+              break
+            fi
+            sleep 2
+          done
+          test -n "${RUN_ID:-}" || { echo 'Autonomous engineer workflow was not created.'; exit 1; }
+
+      - name: Await autonomous engineer
+        if: steps.dispatch.outputs.run_id != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+        run: gh run watch "$RUN_ID" --exit-status --interval 5
+
+      - name: Report autonomous PR result
+        if: always() && steps.task.outputs.issue_number != ''
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+          ISSUE_NUMBER: ${{ steps.task.outputs.issue_number }}
+        run: |
+          set -euo pipefail
+          if [ -z "${RUN_ID:-}" ]; then
+            gh issue comment "$ISSUE_NUMBER" --body "The autonomous PR verifier could not create the worker run. The CI execution is recorded as failed."
+            exit 1
+          fi
+          result=$(gh run view "$RUN_ID" --json conclusion,url,headSha)
+          conclusion=$(printf '%s' "$result" | python3 -c 'import json,sys; print(json.load(sys.stdin)["conclusion"])')
+          url=$(printf '%s' "$result" | python3 -c 'import json,sys; print(json.load(sys.stdin)["url"])')
+          sha=$(printf '%s' "$result" | python3 -c 'import json,sys; print(json.load(sys.stdin)["headSha"])')
+          gh issue comment "$ISSUE_NUMBER" --body "## Nessy autonomous PR verification\n\n- Worker: $url\n- Conclusion: **$conclusion**\n- Worker SHA: \`$sha\`\n- PR: #${{ github.event.pull_request.number }}"
