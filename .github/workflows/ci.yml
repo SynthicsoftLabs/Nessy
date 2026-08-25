@@ -135,14 +135,21 @@ jobs:
       issues: write
       actions: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+
       - name: Resolve latest autonomous task
         id: task
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          issue_number=$(gh issue list --state open --limit 20 --json number,title --jq '[.[] | select(.title | startswith("Autonomous")) | .number] | .[-1] // empty')
+          issue_number=$(gh issue list --repo "$GH_REPO" --state open --limit 20 --json number,title --jq '[.[] | select(.title | startswith("Autonomous")) | .number] | .[-1] // empty')
           if [ -z "$issue_number" ]; then
             echo 'No open autonomous task found.'
             exit 0
@@ -154,16 +161,18 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           ISSUE_NUMBER: ${{ steps.task.outputs.issue_number }}
         run: |
           set -euo pipefail
-          gh issue comment "$ISSUE_NUMBER" --body "Nessy CI autonomous supervisor received the current main validation event and is dispatching the repository engineering worker."
+          gh issue comment "$ISSUE_NUMBER" --repo "$GH_REPO" --body "Nessy CI autonomous supervisor received the current main validation event and is dispatching the repository engineering worker."
 
       - name: Dispatch autonomous supervisor
         if: steps.task.outputs.issue_number != ''
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          gh workflow run nessy-autonomous-supervisor.yml --ref main
+          gh workflow run nessy-autonomous-supervisor.yml --repo "$GH_REPO" --ref main
