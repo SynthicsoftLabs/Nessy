@@ -23,16 +23,18 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   issues: write
   pull-requests: write
   checks: read
-  actions: write
+  actions: read
   copilot-requests: write
 
 env:
   GH_TOKEN: ${{ github.token }}
+  COPILOT_GITHUB_TOKEN: ${{ github.token }}
   GH_REPO: ${{ github.repository }}
+  RUSTFLAGS: '-D warnings'
 
 concurrency:
   group: nessy-autonomous-control-${{ github.event.pull_request.number || github.event.issue.number || github.event.workflow_run.id || github.ref_name }}
@@ -40,9 +42,9 @@ concurrency:
 
 jobs:
   dispatch:
-    name: Autonomous control and recovery
+    name: Autonomous engineering and recovery
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 90
     steps:
       - name: Resolve execution context
         id: context
@@ -77,11 +79,7 @@ jobs:
           esac
           echo "target_ref=$target_ref" >> "$GITHUB_OUTPUT"
           echo "issue_number=$issue_number" >> "$GITHUB_OUTPUT"
-          {
-            echo 'objective<<NESSY_OBJECTIVE'
-            printf '%s\n' "$objective"
-            echo 'NESSY_OBJECTIVE'
-          } >> "$GITHUB_OUTPUT"
+          { echo 'objective<<NESSY_OBJECTIVE'; printf '%s\n' "$objective"; echo 'NESSY_OBJECTIVE'; } >> "$GITHUB_OUTPUT"
 
       - name: Record controller receipt
         shell: bash
@@ -91,23 +89,124 @@ jobs:
         run: |
           set -euo pipefail
           if [ -n "$ISSUE_NUMBER" ]; then
-            gh issue comment "$ISSUE_NUMBER" --repo "$GH_REPO" --body "Nessy Autonomous Control Plane accepted this machine event. The repository engineer will execute from the control-plane completion event."
+            gh issue comment "$ISSUE_NUMBER" --repo "$GH_REPO" --body "Nessy Autonomous Control Plane accepted this machine event and is executing the autonomous engineering cycle directly in this workflow."
           fi
           echo '### Nessy Autonomous Control Plane' >> "$GITHUB_STEP_SUMMARY"
           echo "- Event: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- Target ref: ${{ steps.context.outputs.target_ref }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- Objective: $OBJECTIVE" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Publish machine execution record
+      - name: Checkout engineering target
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.context.outputs.target_ref }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Establish repository state
         shell: bash
         env:
-          TARGET_REF: ${{ steps.context.outputs.target_ref }}
           ISSUE_NUMBER: ${{ steps.context.outputs.issue_number }}
-          OBJECTIVE: ${{ steps.context.outputs.objective }}
         run: |
           set -euo pipefail
-          mkdir -p .nessy
-          printf '%s\n' "$TARGET_REF" > .nessy/autonomous-target-ref
-          printf '%s\n' "$ISSUE_NUMBER" > .nessy/autonomous-issue
-          printf '%s\n' "$OBJECTIVE" > .nessy/autonomous-objective
-          echo "Control-plane context prepared for target=$TARGET_REF" >> "$GITHUB_STEP_SUMMARY"
+          git config user.name 'Nessy Autonomous Engineer'
+          git config user.email 'nessy-autonomous-engineer@users.noreply.github.com'
+          gh auth status
+          git status --short
+          git log --oneline --graph -n 20
+          test -f README.md
+          test -f AUTOMATION.md
+          test -f CONTRIBUTING.md
+          test -f docs/SELF_DEVELOPMENT.md
+          test -f Cargo.toml
+          if [ -n "$ISSUE_NUMBER" ]; then gh issue view "$ISSUE_NUMBER" --repo "$GH_REPO" --json number,title,body,url > /tmp/nessy-issue.json; else printf '%s\n' '{"number":null,"title":"autonomous-maintenance","body":""}' > /tmp/nessy-issue.json; fi
+          git status --short > /tmp/nessy-status.txt
+          git branch --show-current > /tmp/nessy-branch.txt
+          git rev-parse HEAD > /tmp/nessy-head.txt
+          git log --oneline --decorate -n 20 > /tmp/nessy-history.txt
+          gh run list --repo "$GH_REPO" --limit 30 --json databaseId,name,status,conclusion,headBranch,headSha,event,createdAt > /tmp/nessy-runs.json
+          gh pr list --repo "$GH_REPO" --state open --limit 30 --json number,title,headRefName,baseRefName,mergeStateStatus,url > /tmp/nessy-prs.json
+
+      - name: Install Copilot CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install -g @github/copilot
+          copilot --version
+
+      - name: Autonomous engineering cycle
+        shell: bash
+        env:
+          ISSUE_NUMBER: ${{ steps.context.outputs.issue_number }}
+          OBJECTIVE: ${{ steps.context.outputs.objective }}
+          TARGET_REF: ${{ steps.context.outputs.target_ref }}
+        run: |
+          set -euo pipefail
+          ISSUE_CONTEXT="$(cat /tmp/nessy-issue.json)"
+          RUN_CONTEXT="$(cat /tmp/nessy-runs.json)"
+          PR_CONTEXT="$(cat /tmp/nessy-prs.json)"
+          SELF_DEVELOPMENT_CONTEXT="$(cat docs/SELF_DEVELOPMENT.md)"
+          export ISSUE_CONTEXT ISSUE_NUMBER OBJECTIVE TARGET_REF RUN_CONTEXT PR_CONTEXT SELF_DEVELOPMENT_CONTEXT
+          copilot -p 'You are Nessy Autonomous Engineer operating inside SynthicsoftLabs/Nessy.
+
+Execute the complete repository engineering and self-development cycle without asking a human for input.
+
+Repository contract:
+- Read git log --oneline --graph -n 20, README.md, AUTOMATION.md, CONTRIBUTING.md, docs/SELF_DEVELOPMENT.md, affected source, tests, workflows, and git blame before editing.
+- Establish the exact failure or objective from machine evidence: OBJECTIVE, ISSUE_CONTEXT, RUN_CONTEXT, PR_CONTEXT, TARGET_REF, repository state, active PRs, workflow history, and the self-development policy.
+- When the cycle is proactive/self-development work, inspect the complete repository and derive the highest-value unresolved atomic objective using docs/SELF_DEVELOPMENT.md.
+- When the cycle follows a failed workflow, inspect the actual run, logs, checks, and affected repository state before editing. Repair the root cause rather than changing validation to hide the failure.
+- Research relevant repository history and current external capability/model/provider documentation when new functionality or integrations are warranted. Normalize useful discoveries into the repository registries and capability vocabulary.
+- Reproduce failures before implementing fixes. Add focused regression or acceptance coverage before the fix where practical.
+- Trace callers, dependency edges, workflow consumers, public interfaces, and documentation consumers before changing behavior.
+- Implement a complete root-cause change or complete feature increment. No TODOs, placeholders, commented dead code, hardcoded secrets, speculative rewrites, or unrelated changes.
+- Synchronize README, canonical documentation, capability matrices, runtime registries, model registries, and legal/attribution documentation whenever implementation changes them.
+- Run the complete validation matrix: cargo fmt --all -- --check; cargo check --workspace --all-targets; cargo test --workspace --all-targets; cargo clippy --workspace --all-targets --all-features -- -D warnings; cargo audit; cargo deny check; relevant Node syntax/tests; repository integrity; interposition verification; and relevant project scripts.
+- On failure, inspect the actual error, repair the cause, rerun the affected gate, then rerun the complete validation matrix.
+- Inspect the final diff for atomicity, idempotency, documentation synchronization, merge markers, credentials, unrelated changes, generated artifacts, and accidental public API drift.
+- Use one strict Conventional Commit for one logical change.
+- Never push directly to main. If TARGET_REF is main, create an automation/* branch from main before committing. If TARGET_REF is an automation or pull-request branch, continue on that same-repository branch and keep its scope atomic.
+- Push the branch, create or update the appropriate pull request, monitor all checks, and enable automatic merge when every required validation succeeds.
+- After promotion, verify main points to the expected commit and rerun integrity/readiness checks against that exact SHA.
+- If ISSUE_NUMBER is set, comment the exact objective, changed commit/PR, validation result, and verified main SHA on the issue.
+
+No human approval step is part of the normal repository engineering cycle. Do not declare success from intended workflow state; verify actual GitHub state.' --allow-tool='shell(git:*)' --allow-tool='shell(gh:*)' --allow-tool='shell(cargo:*)' --allow-tool='shell(node:*)' --allow-tool='shell(npm:*)' --allow-tool=write --allow-tool=edit --no-ask-user
+
+      - name: Autonomous post-agent validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git status --short
+          test -z "$(git status --porcelain)" || { echo 'Agent left uncommitted changes.'; exit 1; }
+          cargo fmt --all -- --check
+          cargo check --workspace --all-targets
+          cargo test --workspace --all-targets
+          cargo clippy --workspace --all-targets --all-features -- -D warnings
+          if command -v cargo-audit >/dev/null; then cargo audit; fi
+          if command -v cargo-deny >/dev/null; then cargo deny check; fi
+          [ ! -f docs/chat/app.js ] || node --check docs/chat/app.js
+          [ ! -f docs/chat/response-quality.js ] || node --check docs/chat/response-quality.js
+          [ ! -f tests/chat-response-quality.test.js ] || node tests/chat-response-quality.test.js
+          [ ! -f tests/chat-engineering.test.js ] || node tests/chat-engineering.test.js
+          [ ! -f tests/chat-model-routing.test.js ] || node tests/chat-model-routing.test.js
+          bash scripts/verify-interposition.sh
+
+      - name: Record autonomous result
+        if: always()
+        shell: bash
+        env:
+          ISSUE_NUMBER: ${{ steps.context.outputs.issue_number }}
+          OBJECTIVE: ${{ steps.context.outputs.objective }}
+          TARGET_REF: ${{ steps.context.outputs.target_ref }}
+        run: |
+          set -euo pipefail
+          SHA="$(git rev-parse HEAD)"
+          BRANCH="$(git branch --show-current)"
+          echo '### Nessy Autonomous Engineer' >> "$GITHUB_STEP_SUMMARY"
+          echo "- Objective: $OBJECTIVE" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Target ref: $TARGET_REF" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Branch: $BRANCH" >> "$GITHUB_STEP_SUMMARY"
+          echo "- SHA: $SHA" >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$ISSUE_NUMBER" ]; then
+            gh issue comment "$ISSUE_NUMBER" --repo "$GH_REPO" --body "Nessy Autonomous Engineer processed the machine-driven engineering cycle at $SHA on $BRANCH. The workflow result and repository validation gates are the machine record."
+          fi
