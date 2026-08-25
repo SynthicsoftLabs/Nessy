@@ -16,9 +16,9 @@
 
 **Nessy is the engineering foundation of BowserAI:** an autonomous intelligence fabric coordinating AGI capabilities, frontier model providers, runtimes, inference, execution, identity, durable state, MCP tools, research, learning, and distributed infrastructure through one coherent system.
 
-### 💬 [**CHAT WITH NESSY**](https://html-preview.github.io/?url=https://github.com/SynthicsoftLabs/Nessy/blob/main/docs/chat/index.html)
+### 💬 [**CHAT WITH NESSY**](https://html-preview.github.io/?url=https://github.com/SynthicsoftLabs/Nessy/blob/0dc57436e0f5d8198ca4a2f919efae7f3eb75a01/docs/chat/index.html)
 
-**Open the live BowserAI interface directly from this repository.**
+**Open the version-pinned live BowserAI interface directly from this repository.**
 
 </div>
 
@@ -30,7 +30,7 @@
 
 ## ◈ Live Intelligence Interface
 
-The repository ships its browser-native Nessy interface at [`docs/chat/index.html`](docs/chat/index.html). The README chat button uses a repository HTML renderer so the interface is accessible without depending on an unpublished GitHub Pages site.
+The repository ships its browser-native Nessy interface at [`docs/chat/index.html`](docs/chat/index.html). The README chat button uses a repository HTML renderer and pins the preview to a verified repository commit so source and controller assets resolve from the same immutable revision.
 
 ```text
 GitHub Repository
@@ -48,13 +48,14 @@ Repository HTML Renderer
   BowserAI Chat UI
        │
        ▼
-  Kairos / Chat API
+  app.js controller
        │
-       ▼
- Nessy Intelligence Fabric
+       ├── Kairos / Chat API
+       ├── Pollinations
+       └── Browser inference
 ```
 
-The chat surface is dependency-free: a single browser application with session continuity, capability declarations, responsive layout, keyboard-friendly composition, and endpoint configuration through `?endpoint=`. The application source is versioned directly in this repository.
+The chat surface is versioned directly in this repository with its executable controller at [`docs/chat/app.js`](docs/chat/app.js), runtime configuration at [`docs/chat/runtime.json`](docs/chat/runtime.json), persistent browser history, keyboard-friendly composition, and automatic runtime failover.
 
 ## ◈ System Fabric
 
@@ -199,7 +200,7 @@ Autonomous bootstrap is provided by `scripts/bootstrap.sh`.
 │   ├── github-backend/   GitHub backend
 │   └── bowserd/          daemon
 ├── docs/
-│   ├── chat/             repository-native chat UI
+│   ├── chat/             repository-native chat UI + controller
 │   ├── AGI_CAPABILITY_MATRIX.md
 │   └── ...
 ├── scripts/              autonomous tooling
@@ -217,6 +218,7 @@ Autonomous bootstrap is provided by `scripts/bootstrap.sh`.
 |:--|:--|
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Full system topology and runtime fabric |
 | [`docs/chat/index.html`](docs/chat/index.html) | Browser chat interface |
+| [`docs/chat/app.js`](docs/chat/app.js) | Executable chat controller |
 | [`docs/AGI_CAPABILITY_MATRIX.md`](docs/AGI_CAPABILITY_MATRIX.md) | AGI domains and frontier-provider capability map |
 | [`AUTOMATION.md`](AUTOMATION.md) | Autonomous engineering and repository automation |
 | [`SECURITY.md`](SECURITY.md) | Security architecture |
