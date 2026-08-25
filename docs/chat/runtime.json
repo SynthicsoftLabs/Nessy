@@ -1,13 +1,14 @@
 {
-  "version": 3,
+  "version": 5,
   "project": "BowserAI/Nessy",
   "discovery": {
-    "strategy": "automatic",
+    "strategy": "embedded-first",
     "configuration": "repository",
     "manual_endpoint_required": false,
     "embedded_manifest_fallback": true,
-    "failover": "priority_then_fallback",
-    "health": "request_probe"
+    "failover": "remote-priority-then-browser-inference",
+    "manifest_timeout_ms": 8000,
+    "runtime_timeout_ms": 12000
   },
   "runtimes": [
     {
@@ -19,24 +20,20 @@
     },
     {
       "name": "pollinations",
-      "base": "https://text.pollinations.ai",
-      "chat_paths": ["/"],
-      "method": "GET",
-      "priority": 50
+      "base": "https://gen.pollinations.ai",
+      "chat_paths": ["/v1/chat/completions"],
+      "method": "POST",
+      "priority": 70
     }
   ],
-  "capabilities": [
-    "reasoning",
-    "planning",
-    "memory",
-    "research",
-    "tools",
-    "coding",
-    "multimodal",
-    "self_evaluation",
-    "capability_routing",
-    "continuous_learning"
-  ],
+  "browser": {
+    "engine": "webllm",
+    "model": "Llama-3.2-1B-Instruct-q4f16_1-MLC",
+    "priority": 10,
+    "webgpu_required": true,
+    "cdn": "https://esm.run/@mlc-ai/web-llm"
+  },
+  "capabilities": ["reasoning", "planning", "memory", "research", "tools", "coding", "multimodal", "self_evaluation", "capability_routing", "continuous_learning"],
   "session": {
     "client_persistence": "sessionStorage",
     "server_session": true
