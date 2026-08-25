@@ -1,0 +1,88 @@
+# Copyright 2026 Adam Joseph Rivers, CEO, Synthicsoft Labs LLC.
+# Licensed under the Apache License, Version 2.0.
+name: Nessy Autonomous Supervisor
+
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Issue to process'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+  actions: write
+
+concurrency:
+  group: nessy-autonomous-supervisor-${{ github.event.issue.number || github.event.inputs.issue_number || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  dispatch-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Dispatch autonomous engineer
+        id: dispatch
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number || github.event.inputs.issue_number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          set -euo pipefail
+          START_EPOCH=$(date -u +%s)
+          echo "start_epoch=$START_EPOCH" >> "$GITHUB_OUTPUT"
+          gh workflow run nessy-autonomous-engineer.yml \
+            --ref main \
+            -f issue_number="$ISSUE_NUMBER" \
+            -f objective="$ISSUE_BODY"
+
+          for attempt in $(seq 1 30); do
+            RUN_ID=$(gh run list \
+              --workflow nessy-autonomous-engineer.yml \
+              --event workflow_dispatch \
+              --limit 20 \
+              --json databaseId,createdAt,headBranch \
+              --jq 'map(select(.headBranch == "main")) | sort_by(.createdAt) | last | .databaseId // empty')
+            if [ -n "$RUN_ID" ]; then
+              echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+              break
+            fi
+            sleep 2
+          done
+
+          test -n "${RUN_ID:-}" || { echo 'Autonomous engineer workflow was not created.'; exit 1; }
+
+      - name: Await autonomous engineer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+        run: gh run watch "$RUN_ID" --exit-status --interval 5
+
+      - name: Verify and report
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+          ISSUE_NUMBER: ${{ github.event.issue.number || github.event.inputs.issue_number }}
+        run: |
+          set -euo pipefail
+          RESULT=$(gh run view "$RUN_ID" --json conclusion,status,url,headSha,workflowName)
+          CONCLUSION=$(printf '%s' "$RESULT" | python3 -c 'import json,sys; print(json.load(sys.stdin)["conclusion"])')
+          URL=$(printf '%s' "$RESULT" | python3 -c 'import json,sys; print(json.load(sys.stdin)["url"])')
+          HEAD_SHA=$(printf '%s' "$RESULT" | python3 -c 'import json,sys; print(json.load(sys.stdin)["headSha"])')
+          MAIN_SHA=$(gh api repos/${GITHUB_REPOSITORY}/commits/main --jq '.sha')
+          gh issue comment "$ISSUE_NUMBER" --body "## Nessy autonomous engineering result\n\n- Worker: $URL\n- Worker conclusion: **$CONCLUSION**\n- Worker SHA: \`$HEAD_SHA\`\n- Current main SHA: \`$MAIN_SHA\`\n\nThe supervisor waited for the autonomous engineer workflow to finish and recorded the resulting GitHub state."
+
+          echo '### Autonomous supervisor' >> "$GITHUB_STEP_SUMMARY"
+          echo "- Issue: #$ISSUE_NUMBER" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Worker: $URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Conclusion: $CONCLUSION" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Worker SHA: $HEAD_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Main SHA: $MAIN_SHA" >> "$GITHUB_STEP_SUMMARY"
