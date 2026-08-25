@@ -1,11 +1,13 @@
 {
-  "version": 2,
+  "version": 3,
   "project": "BowserAI/Nessy",
   "discovery": {
     "strategy": "automatic",
     "configuration": "repository",
     "manual_endpoint_required": false,
-    "failover": "priority_then_fallback"
+    "embedded_manifest_fallback": true,
+    "failover": "priority_then_fallback",
+    "health": "request_probe"
   },
   "runtimes": [
     {
@@ -16,11 +18,11 @@
       "priority": 100
     },
     {
-      "name": "community-text",
-      "base": "https://text.pollinations.ai/",
-      "chat_paths": [""],
+      "name": "pollinations",
+      "base": "https://text.pollinations.ai",
+      "chat_paths": ["/"],
       "method": "GET",
-      "priority": 10
+      "priority": 50
     }
   ],
   "capabilities": [
