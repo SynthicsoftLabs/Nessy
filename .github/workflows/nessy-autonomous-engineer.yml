@@ -13,6 +13,10 @@ on:
         description: 'Objective supplied by the autonomous control plane'
         required: true
         type: string
+      target_ref:
+        description: 'Repository ref the engineer must operate on'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -41,7 +45,7 @@ jobs:
       - name: Checkout engineering target
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref_name }}
+          ref: ${{ github.event.inputs.target_ref }}
           fetch-depth: 0
           persist-credentials: true
 
@@ -147,6 +151,7 @@ Do not ask for confirmation. Do not declare success from intended workflow state
           BRANCH="$(git branch --show-current)"
           echo '### Nessy Autonomous Engineer' >> "$GITHUB_STEP_SUMMARY"
           echo "- Objective: ${{ github.event.inputs.objective }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Target ref: ${{ github.event.inputs.target_ref }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- Branch: $BRANCH" >> "$GITHUB_STEP_SUMMARY"
           echo "- SHA: $SHA" >> "$GITHUB_STEP_SUMMARY"
           if [ -n "$ISSUE_NUMBER" ]; then
