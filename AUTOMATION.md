@@ -1,60 +1,85 @@
 # BowserAI Autonomous Engineering
 
-BowserAI/Nessy treats the repository itself as the autonomous engineering control plane. Validation, diagnosis, repair, testing, branch management, pull-request creation, promotion, and post-merge verification are designed to execute without an operator-driven setup phase.
+BowserAI/Nessy treats the repository itself as the autonomous engineering control plane. The complete lifecycle from event intake through diagnosis, repair, validation, promotion, and post-merge verification is repository-owned and machine-driven.
+
+## Control-plane topology
+
+`Nessy Autonomous Control Plane` is the sole dispatcher. `Nessy Autonomous Engineer` is the worker.
+
+```text
+repository event
+      |
+      v
+Autonomous Control Plane
+      |
+      +--> issue / PR context
+      +--> workflow result / failure context
+      +--> main push health cycle
+      +--> scheduled maintenance
+      |
+      v
+Autonomous Engineer
+      |
+      +--> read history / README / blame / dependency graph
+      +--> reproduce / regression test
+      +--> root-cause implementation
+      +--> complete validation matrix
+      +--> atomic Conventional Commit
+      +--> automation branch + PR
+      +--> automatic promotion
+      +--> post-merge verification
+      |
+      v
+verified main state
+```
+
+The control plane listens to repository pushes, pull-request changes, issue creation, completion of the repository validation workflows, scheduled health cycles, and direct workflow dispatch. It resolves machine context, dispatches the worker with an explicit repository/ref/objective, and records an execution receipt when an issue is involved.
+
+The engineer workflow is intentionally worker-only and accepts machine objectives through `workflow_dispatch`. It does not ask an operator for configuration or confirmation.
 
 ## Engineering loop
 
-The `Nessy Autonomous Engineer` workflow continuously applies the repository engineering contract:
-
-1. Read repository lineage, README, architecture, affected files, and blame before editing.
-2. Inspect workflow state, commit state, pull requests, and dependency relationships.
-3. Reproduce defects before changing implementation.
-4. Add or update regression coverage for the observed failure.
-5. Trace callers and dependent interfaces before changing signatures.
+1. Establish repository lineage and current state before editing.
+2. Read README, architecture, contribution rules, affected source, tests, workflows, and blame context.
+3. Determine the actual objective from machine evidence and reproduce observed failures.
+4. Add focused regression coverage for defects.
+5. Trace callers, dependency edges, workflow consumers, and public interfaces before changing behavior.
 6. Apply the smallest complete root-cause fix.
-7. Execute the full validation matrix, including Rust build/test/lint, audit/deny, chat JavaScript checks, and repository integrity.
-8. Iterate on actual failures until the tree is clean.
-9. Inspect the final diff and enforce atomic Conventional Commits.
-10. Keep `main` protected from direct agent pushes by using automation branches and pull requests.
-11. Open or update pull requests, monitor checks, and automatically promote validated changes.
-12. Verify the resulting `main` commit and repository integrity after promotion.
+7. Execute the complete validation matrix: Rust formatting, check, tests, Clippy, RustSec audit, cargo-deny policy, chat JavaScript validation, repository integrity, and relevant project scripts.
+8. Repair failed gates and repeat the complete matrix until the tree is clean.
+9. Inspect the final diff for atomicity, idempotency, documentation, credentials, merge markers, generated artifacts, and unrelated changes.
+10. Commit one logical change using a strict Conventional Commit.
+11. Never work directly on `main`; create or update an automation branch and use a pull request for promotion.
+12. Monitor validation and automatically promote only the verified result.
+13. Re-read `main` after promotion and verify repository integrity against the resulting SHA.
+14. Record the machine result to the driving issue when an issue exists.
 
-The workflow uses GitHub Copilot CLI in non-interactive mode through the repository's Actions runtime. GitHub documents Copilot CLI execution from Actions and the `GITHUB_TOKEN`-based organization flow, including `copilot-requests: write`. The agent is explicitly prohibited from prompting for user input and is given repository-native GitHub, Git, build, test, and editing tools.
+## Failure ownership
 
-## Failure-driven operation
+A failed validation workflow is a first-class engineering input. The control plane dispatches the same engineer against the affected ref with the workflow identity, result, SHA, and explicit repair objective. This turns failures into machine-generated engineering tasks instead of human triage queues.
 
-A completed workflow failure automatically becomes an engineering input. The autonomous engineer retrieves the failing run context, reads the affected source and test surface, reproduces the failure, repairs the root cause, reruns the complete validation matrix, and promotes the verified result.
+The control plane also runs scheduled maintenance so defects are discovered independently of user reports or individual commits.
 
-The same engine also runs on pull-request updates, on pushes to automation branches, and on a recurring schedule so repository drift, stale documentation, latent test failures, and integration defects are continuously discovered rather than waiting for a maintainer to notice them.
+## Automation safety and determinism
 
-## Autonomous execution verification
+All GitHub CLI calls in automation specify `--repo "$GITHUB_REPOSITORY"`; jobs that need repository files explicitly check out the target ref. This prevents implicit local-Git discovery from becoming a systemic failure mode.
 
-Every autonomous cycle is itself observable. The triggering event, target SHA, working branch, pull-request state, validation result, promotion result, and post-merge target SHA are written into the GitHub Actions step summary. A cycle is considered complete only after the promoted `main` commit has been independently re-read and repository integrity succeeds against that exact commit.
+The worker validates its final tree before promotion. Success is recorded only after the resulting GitHub state can be directly inspected. Intended state is never substituted for observed state.
 
-A fresh same-repository pull request or automation-branch push is therefore a complete machine-generated verification trigger: the autonomous engineer must inspect the repository, perform the engineering cycle, update the pull request as required, wait for the validation matrix, promote the result, and verify the resulting `main` state without requesting operator input.
+## Scope
 
-## Git contract
-
-`main` is never the working branch for an autonomous change. Repairs are committed on an isolated automation branch and promoted through a pull request. Logical work remains atomic and uses Conventional Commit messages.
-
-## Chat and runtime contract
-
-The repository chat remains subject to the same engineering loop. Runtime routing, browser inference, response-quality gates, persistent history, UI wiring, and deployment artifacts are validated as executable surfaces rather than documentation claims.
-
-## Recovery contract
-
-When a gate fails, the failure becomes the next task. The automation does not replace the failed result with a green assertion; it fixes the underlying cause and reruns the gate. Repository integrity and post-merge verification are treated as first-class engineering checks.
+This repository-owned loop covers the work performed during the Nessy build sequence: repository construction, documentation, chat and runtime surfaces, model/provider redundancy, licensing policy, CI/CD, integrity checks, security ingestion, autonomous supervision, regression repair, branch/PR management, release validation, and continuous maintenance.
 
 ## Human-free operation
 
-Routine repository engineering is intended to proceed from repository state and machine-readable evidence. Human-operated setup is not part of the normal execution path. GitHub Actions, the repository Git graph, existing project tooling, and the configured coding-agent runtime form the control loop.
+Normal operation requires no human-driven setup, configuration, steering, task handoff, or approval inside the engineering loop. Machine-readable repository events and the configured GitHub Actions runtime are the inputs to the control plane.
 
 ## Bootstrap
 
-The host bootstrap path remains:
+The host bootstrap path remains available through:
 
 ```bash
 ./scripts/bootstrap.sh
 ```
 
-The repository-level engineering loop is independent of host bootstrap and operates from GitHub Actions.
+The autonomous repository engineering control plane is independent of host bootstrap and operates from GitHub Actions.
