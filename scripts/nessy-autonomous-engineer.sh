@@ -29,7 +29,6 @@ if [[ -n "$OPEN_PR" ]]; then
   exit 0
 fi
 
-# Serialize branch ownership across retries and previous experiments.
 git fetch origin main --prune
 REMOTE_MAIN="$(git rev-parse origin/main)"
 if [[ "$REMOTE_MAIN" != "$START_SHA" ]]; then
@@ -148,6 +147,10 @@ if [[ "$ENGINE_SUCCESS" -eq 0 ]]; then
   exit 1
 fi
 
+# Aider writes a tracked session transcript during execution. It is runtime state,
+# not an engineering artifact, so restore the repository copy before validation.
+git restore -- .aider.chat.history.md 2>/dev/null || true
+
 # Deterministic pre-commit validation. Do not call immutable-tree verification here: the
 # working tree is intentionally dirty until the autonomous change is committed.
 git diff --check
@@ -169,7 +172,6 @@ if [[ -z "$(git status --porcelain)" ]]; then
   exit 0
 fi
 
-# Reconcile against the latest main before the sole commit.
 git fetch origin main --prune
 LATEST_MAIN="$(git rev-parse origin/main)"
 CURRENT_BASE="$(git merge-base HEAD origin/main)"
@@ -179,7 +181,6 @@ fi
 
 git diff --check
 git status --short
-
 git config user.name 'Nessy Autonomous Engineer'
 git config user.email 'nessy-autonomous-engineer@users.noreply.github.com'
 git add -A
@@ -192,7 +193,6 @@ if [[ -z "$PR_NUMBER" ]]; then
   PR_NUMBER="${PR_URL##*/}"
 fi
 
-# Automatic promotion; branch deletion is safe after merge and prevents accumulation.
 gh pr merge "$PR_NUMBER" --repo "$GH_REPO" --auto --squash --delete-branch || \
 gh pr merge "$PR_NUMBER" --repo "$GH_REPO" --squash --delete-branch
 
@@ -202,7 +202,6 @@ if [[ -z "$PROMOTED_SHA" ]]; then
   exit 1
 fi
 
-# Immutable-state verification belongs after the commit is pushed, when the working tree is clean.
 GITHUB_SHA="$PROMOTED_SHA" GITHUB_REF_NAME="main" GITHUB_EVENT_NAME="push" GITHUB_REPOSITORY="$GH_REPO" bash scripts/verify-interposition.sh
 
 if [[ -n "$ISSUE_NUMBER" ]]; then
