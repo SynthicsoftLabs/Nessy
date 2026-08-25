@@ -3,6 +3,8 @@
 name: Nessy Autonomous Supervisor
 
 on:
+  push:
+    branches: [main]
   issues:
     types: [opened]
   workflow_dispatch:
@@ -26,24 +28,42 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
-      - name: Record supervisor receipt
+      - name: Resolve autonomous task
+        id: task
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number || github.event.inputs.issue_number }}
+        run: |
+          set -euo pipefail
+          if [ -n "$ISSUE_NUMBER" ]; then
+            echo "issue_number=$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          ISSUE_NUMBER=$(gh issue list --state open --limit 20 --json number,title --jq '[.[] | select(.title | startswith("Autonomous")) | .number] | .[-1] // empty')
+          test -n "$ISSUE_NUMBER" || { echo 'No open autonomous task found.'; exit 0; }
+          echo "issue_number=$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Record supervisor receipt
+        if: steps.task.outputs.issue_number != ''
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ steps.task.outputs.issue_number }}
         run: |
           set -euo pipefail
           gh issue comment "$ISSUE_NUMBER" --body "Nessy Autonomous Supervisor accepted this task and is dispatching the autonomous engineer."
 
       - name: Dispatch autonomous engineer
+        if: steps.task.outputs.issue_number != ''
         id: dispatch
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          ISSUE_NUMBER: ${{ github.event.issue.number || github.event.inputs.issue_number }}
-          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ steps.task.outputs.issue_number }}
         run: |
           set -euo pipefail
+          ISSUE_BODY=$(gh issue view "$ISSUE_NUMBER" --json body --jq '.body')
           gh workflow run nessy-autonomous-engineer.yml \
             --ref main \
             -f issue_number="$ISSUE_NUMBER" \
@@ -66,6 +86,7 @@ jobs:
           test -n "${RUN_ID:-}" || { echo 'Autonomous engineer workflow was not created.'; exit 1; }
 
       - name: Await autonomous engineer
+        if: steps.dispatch.outputs.run_id != ''
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ steps.dispatch.outputs.run_id }}
@@ -77,11 +98,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ steps.dispatch.outputs.run_id }}
-          ISSUE_NUMBER: ${{ github.event.issue.number || github.event.inputs.issue_number }}
+          ISSUE_NUMBER: ${{ steps.task.outputs.issue_number }}
         run: |
           set -euo pipefail
+          if [ -z "${ISSUE_NUMBER:-}" ]; then
+            echo 'No autonomous task was found; supervisor completed without work.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           if [ -z "${RUN_ID:-}" ]; then
-            gh issue comment "$ISSUE_NUMBER" --body "## Nessy autonomous engineering result\n\nSupervisor could not create the autonomous engineer run. The failure is recorded by this supervisor execution and requires repository-side remediation."
+            gh issue comment "$ISSUE_NUMBER" --body "## Nessy autonomous engineering result\n\nThe supervisor accepted the task but could not create the autonomous engineer run. The failure is recorded for the next recovery cycle."
             exit 1
           fi
           RESULT=$(gh run view "$RUN_ID" --json conclusion,status,url,headSha,workflowName)
@@ -90,6 +115,9 @@ jobs:
           HEAD_SHA=$(printf '%s' "$RESULT" | python3 -c 'import json,sys; print(json.load(sys.stdin)["headSha"])')
           MAIN_SHA=$(gh api repos/${GITHUB_REPOSITORY}/commits/main --jq '.sha')
           gh issue comment "$ISSUE_NUMBER" --body "## Nessy autonomous engineering result\n\n- Worker: $URL\n- Worker conclusion: **$CONCLUSION**\n- Worker SHA: \`$HEAD_SHA\`\n- Current main SHA: \`$MAIN_SHA\`\n\nThe supervisor waited for the autonomous engineer workflow to finish and recorded the resulting GitHub state."
+          if [ "$CONCLUSION" = "success" ]; then
+            gh issue close "$ISSUE_NUMBER" --comment "Autonomous engineering cycle completed successfully and was independently recorded above."
+          fi
 
           echo '### Autonomous supervisor' >> "$GITHUB_STEP_SUMMARY"
           echo "- Issue: #$ISSUE_NUMBER" >> "$GITHUB_STEP_SUMMARY"
