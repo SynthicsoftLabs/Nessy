@@ -10,6 +10,7 @@ required=(
   '.github/workflows/nessy-autonomous-engineer.yml'
   '.github/workflows/nessy-autonomous-supervisor.yml'
   '.github/workflows/interposition.yml'
+  '.github/workflows/ci.yml'
   'scripts/verify-interposition.sh'
   'AUTOMATION.md'
 )
@@ -24,6 +25,8 @@ grep -q 'actions: write' .github/workflows/nessy-autonomous-supervisor.yml
 grep -q 'copilot-requests: write' .github/workflows/nessy-autonomous-engineer.yml
 grep -q 'Dispatch autonomous supervisor' .github/workflows/interposition.yml
 grep -q 'gh workflow run nessy-autonomous-supervisor.yml' .github/workflows/interposition.yml
+grep -q 'autonomous-supervisor:' .github/workflows/ci.yml
+grep -q 'gh workflow run nessy-autonomous-supervisor.yml' .github/workflows/ci.yml
 grep -q 'INTERPOSITION CHECK PASSED' scripts/verify-interposition.sh
 grep -q 'Human-free operation' AUTOMATION.md
 
