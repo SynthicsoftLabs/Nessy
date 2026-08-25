@@ -38,16 +38,30 @@ jobs:
         run: |
           set -euo pipefail
           test -s docs/chat/index.html
+          test -s docs/chat/app.js
           test -s docs/chat/runtime.json
           grep -q '<html' docs/chat/index.html
-          grep -q 'Nessy' docs/chat/index.html
+          grep -q 'src="./app.js"' docs/chat/index.html
+          grep -q 'BowserAI' docs/chat/index.html
+          grep -q 'Nessy' docs/chat/app.js
+          node --check docs/chat/app.js
           python3 - <<'PY'
           import json
           from pathlib import Path
           data = json.loads(Path('docs/chat/runtime.json').read_text())
           assert isinstance(data, dict)
           assert isinstance(data.get('runtimes'), list)
+          assert isinstance(data.get('browser'), dict)
           PY
+
+      - name: Verify runtime graph consistency
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'the-real-kairos.com' docs/chat/app.js
+          grep -q 'gen.pollinations.ai' docs/chat/app.js
+          grep -q 'HuggingFaceTB/SmolLM2-360M-Instruct' docs/chat/app.js
+          grep -q 'HuggingFaceTB/SmolLM2-135M-Instruct' docs/chat/app.js
 
       - name: Package chat surface
         shell: bash
