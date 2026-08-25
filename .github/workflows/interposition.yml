@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
   verify:
@@ -35,8 +36,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for f in .github/workflows/ci.yml .github/workflows/integrity.yml .github/workflows/pages.yml .github/workflows/interposition.yml; do
+          for f in .github/workflows/ci.yml .github/workflows/integrity.yml .github/workflows/pages.yml .github/workflows/interposition.yml .github/workflows/nessy-autonomous-engineer.yml .github/workflows/nessy-autonomous-supervisor.yml; do
             test -f "$f"
             git cat-file -e "HEAD:$f"
             test "$(git rev-parse HEAD:$f)" = "$(git hash-object "$f")"
           done
+      - name: Dispatch autonomous supervisor
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run nessy-autonomous-supervisor.yml --ref main
