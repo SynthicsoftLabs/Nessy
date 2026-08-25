@@ -107,13 +107,14 @@ EOF
 run_aider() {
   local base_url="$1"
   local api_key="$2"
-  local label="$3"
+  local model="$3"
+  local label="$4"
   local log="/tmp/nessy-aider-${label}.log"
   echo "Nessy provider attempt: $label"
   set +e
   OPENAI_API_KEY="$api_key" aider \
     --openai-api-base "$base_url" \
-    --model "${NESSY_AIDER_MODEL:-openai/default}" \
+    --model "$model" \
     --message-file /tmp/nessy-aider-prompt.md \
     --yes-always \
     --no-auto-commits \
@@ -129,17 +130,68 @@ run_aider() {
 }
 
 ENGINE_SUCCESS=0
-if run_aider "${NESSY_LLM7_BASE_URL:-https://api.llm7.io/v1}" "${LLM7_API_KEY:-unused}" "LLM7"; then
-  ENGINE_SUCCESS=1
+
+if [[ -n "${LLM7_API_KEY:-}" ]]; then
+  if run_aider "${NESSY_LLM7_BASE_URL:-https://api.llm7.io/v1}" "$LLM7_API_KEY" "${NESSY_AIDER_MODEL:-openai/default}" "LLM7"; then
+    ENGINE_SUCCESS=1
+  else
+    echo "LLM7 failed; routing to the next configured provider." >&2
+  fi
 else
-  echo "LLM7 failed; routing to the next configured provider." >&2
+  echo "LLM7 credential unavailable; routing directly to the keyless fallback chain."
 fi
 
 if [[ "$ENGINE_SUCCESS" -eq 0 && -n "${POLLINATIONS_API_KEY:-}" ]]; then
-  if run_aider "${NESSY_POLLINATIONS_BASE_URL:-https://gen.pollinations.ai/v1}" "$POLLINATIONS_API_KEY" "Pollinations"; then
+  if run_aider "${NESSY_POLLINATIONS_BASE_URL:-https://gen.pollinations.ai/v1}" "$POLLINATIONS_API_KEY" "${NESSY_POLLINATIONS_MODEL:-openai/default}" "Pollinations"; then
     ENGINE_SUCCESS=1
   else
-    echo "Pollinations failed; no provider result available." >&2
+    echo "Pollinations failed; routing to the local provider." >&2
+  fi
+fi
+
+start_local_ollama() {
+  local model="${NESSY_LOCAL_MODEL:-qwen2.5-coder:0.5b}"
+  local context_length="${NESSY_OLLAMA_CONTEXT_LENGTH:-32768}"
+
+  if ! command -v ollama >/dev/null 2>&1; then
+    echo "Installing repository-selected Ollama runtime for keyless local inference."
+    curl -fsSL https://ollama.com/install.sh | sh
+  fi
+
+  if ! pgrep -x ollama >/dev/null 2>&1; then
+    echo "Starting local Ollama service."
+    OLLAMA_CONTEXT_LENGTH="$context_length" nohup ollama serve >/tmp/nessy-ollama.log 2>&1 &
+  fi
+
+  for _ in $(seq 1 60); do
+    if curl -fsS http://127.0.0.1:11434/api/tags >/dev/null 2>&1; then
+      break
+    fi
+    sleep 1
+  done
+
+  curl -fsS http://127.0.0.1:11434/api/tags >/dev/null
+  echo "Pulling keyless local coding model: $model"
+  ollama pull "$model"
+
+  export OLLAMA_API_BASE="${NESSY_OLLAMA_API_BASE:-http://127.0.0.1:11434}"
+  export OLLAMA_CONTEXT_LENGTH="$context_length"
+  LOCAL_MODEL="$model"
+}
+
+if [[ "$ENGINE_SUCCESS" -eq 0 ]]; then
+  if start_local_ollama; then
+    if run_aider "${NESSY_OLLAMA_API_BASE:-http://127.0.0.1:11434}" "ollama" "ollama_chat/${LOCAL_MODEL}" "Ollama-${LOCAL_MODEL//[:\/]/-}"; then
+      ENGINE_SUCCESS=1
+    else
+      echo "Primary local model failed; trying the compact SmolLM2 fallback." >&2
+      if [[ "$LOCAL_MODEL" != "smollm2:360m-instruct-q4_0" ]]; then
+        ollama pull smollm2:360m-instruct-q4_0
+        if run_aider "${NESSY_OLLAMA_API_BASE:-http://127.0.0.1:11434}" "ollama" "ollama_chat/smollm2:360m-instruct-q4_0" "Ollama-Smollm2"; then
+          ENGINE_SUCCESS=1
+        fi
+      fi
+    fi
   fi
 fi
 
@@ -179,7 +231,6 @@ fi
 
 git diff --check
 git status --short
-
 git config user.name 'Nessy Autonomous Engineer'
 git config user.email 'nessy-autonomous-engineer@users.noreply.github.com'
 git add -A
