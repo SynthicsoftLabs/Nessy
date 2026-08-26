@@ -1,8 +1,4 @@
-"""OpenLedger Finance: vendor-neutral real-time market-data aggregation API.
-
-The service normalizes data from licensed/public feeds. It does not bypass
-vendor authentication, entitlements, rate limits, or access controls.
-"""
+"""OpenLedger Finance: vendor-neutral real-time market-data aggregation API."""
 from __future__ import annotations
 
 import asyncio
@@ -13,7 +9,7 @@ from datetime import datetime, timezone
 from typing import Protocol
 
 from fastapi import FastAPI, HTTPException, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class Quote(BaseModel):
@@ -34,19 +30,11 @@ class MarketSource(Protocol):
 
 @dataclass
 class StaticSource:
-    """Deterministic source used for development and integration tests."""
-
     name: str = "static"
 
     async def quote(self, symbol: str) -> Quote | None:
-        now = datetime.now(timezone.utc)
         return Quote(
-            symbol=symbol.upper(),
-            bid=None,
-            ask=None,
-            last=None,
-            source=self.name,
-            timestamp=now,
+            symbol=symbol.upper(), source=self.name, timestamp=datetime.now(timezone.utc)
         )
 
 
@@ -78,21 +66,38 @@ class Aggregator:
         if not symbol or len(symbol) > 32:
             raise ValueError("invalid symbol")
         symbol = symbol.upper()
+        errors: list[str] = []
         for source in self.sources:
-            await self.limiters[source.name].acquire()
-            result = await source.quote(symbol)
-            if result and any(value is not None for value in (result.bid, result.ask, result.last)):
-                return result
-        raise LookupError(f"no quote available for {symbol}")
+            try:
+                await self.limiters[source.name].acquire()
+                result = await source.quote(symbol)
+                if result and any(v is not None for v in (result.bid, result.ask, result.last)):
+                    return result
+            except Exception as exc:  # isolate one provider from the aggregation plane
+                errors.append(f"{source.name}: {type(exc).__name__}")
+        detail = f"no quote available for {symbol}"
+        if errors:
+            detail += f"; source failures: {', '.join(errors)}"
+        raise LookupError(detail)
 
 
-app = FastAPI(title="OpenLedger Finance", version="0.1.0")
-aggregator = Aggregator([StaticSource()])
+def build_sources() -> list[MarketSource]:
+    sources: list[MarketSource] = []
+    if os.getenv("OPENLEDGER_BLOOMBERG_ENABLED", "0").lower() in {"1", "true", "yes"}:
+        from bloomberg_source import BloombergSource
+
+        sources.append(BloombergSource())
+    sources.append(StaticSource())
+    return sources
+
+
+app = FastAPI(title="OpenLedger Finance", version="0.2.0")
+aggregator = Aggregator(build_sources())
 
 
 @app.get("/health")
-async def health() -> dict[str, str]:
-    return {"status": "ok", "service": "openledger-finance"}
+async def health() -> dict[str, object]:
+    return {"status": "ok", "service": "openledger-finance", "sources": [s.name for s in aggregator.sources]}
 
 
 @app.get("/v1/quote", response_model=Quote)
