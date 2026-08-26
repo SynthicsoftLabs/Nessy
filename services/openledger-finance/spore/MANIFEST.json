@@ -1,0 +1,24 @@
+{
+  "name": "openledger-finance",
+  "version": "0.2.0",
+  "protocol": "skill-chain-architect-v2.0",
+  "purpose": "Vendor-neutral market-data aggregation with an optional authorized Bloomberg BLPAPI adapter",
+  "origin": "Synthicsoft Labs LLC / Adam Joseph Rivers",
+  "license": "Apache-2.0",
+  "integrity": {
+    "algorithm": "SHA-256",
+    "files": {
+      "../app.py": "99d45c40f6164d4f5d08c44314b643b6f595247c3cbd033dd291e0acc8899cf1",
+      "../bloomberg_source.py": "8104c0069ae55813d1213b0d44e7c170117f71839cac4fa7219ef8af501ce7f1"
+    }
+  },
+  "deployment": {
+    "api": "FastAPI",
+    "test": "pytest",
+    "bloomberg": "BLPAPI via authorized SAPI/B-PIPE environment"
+  },
+  "signature": {
+    "status": "unsigned",
+    "reason": "No signing private key was supplied to this execution context"
+  }
+}
