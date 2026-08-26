@@ -3,3 +3,6 @@ uvicorn[standard]>=0.34,<1
 pydantic>=2.10,<3
 pytest>=8,<9
 httpx>=0.27,<1
+# Bloomberg's official Python SDK. Install from Bloomberg's package index when
+# Bloomberg B-PIPE/SAPI integration is enabled.
+# python -m pip install --index-url=https://blpapi.bloomberg.com/repository/releases/python/simple/ blpapi
