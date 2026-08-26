@@ -68,7 +68,7 @@ pub struct CapabilityNode {
     pub version: String,
     pub inputs: Vec<String>,
     pub outputs: Vec<String>,
-    pub prerequisites: HashSet<AgiCapability>,
+    pub prerequisites: HashSet<String>,
     pub quality: f64,
     pub latency_ms: u64,
     pub healthy: bool,
@@ -111,7 +111,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn graph_selects_best_healthy_provider() {
+    fn test_capability_composition() {
         let mut graph = CapabilityGraph::default();
         for (id, provider, quality) in [("local", "local", 0.70), ("frontier", "frontier", 0.99)] {
             graph.register(CapabilityNode {
@@ -120,7 +120,7 @@ mod tests {
                 provider: provider.into(),
                 version: "1".into(),
                 inputs: vec!["prompt".into()],
-                outputs: vec!["answer".into()],
+                outputs: vec!["thought".into()],
                 prerequisites: HashSet::new(),
                 quality,
                 latency_ms: 10,
