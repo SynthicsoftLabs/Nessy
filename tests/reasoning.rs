@@ -6,7 +6,7 @@ use super::*;
 fn test_reasoning_engine() {
     let mut engine = ReasoningEngine::new();
     engine.add_fact("capital of France", "Paris");
-    assert_eq!(engine.reason("What is the capital of France?"), Some("Paris".to_string()));
+    assert_eq!(engine.reason("What is the capital of France?"), Some("Paris"));
     assert_eq!(engine.reason("What is the capital of Germany?"), None);
     let reflected = engine.reflect();
     assert_eq!(reflected.len(), 1);
@@ -15,4 +15,17 @@ fn test_reasoning_engine() {
     let hypotheses = engine.generate_hypotheses("Paris is the capital of France");
     assert!(hypotheses.is_empty());
     assert!(engine.verify("Paris is the capital of France"));
+}
+
+#[test]
+fn test_reasoning_engine_generate_hypotheses() {
+    let mut engine = ReasoningEngine::new();
+    engine.add_fact("capital of France", "Paris");
+    engine.add_fact("Paris is the capital of France", "true");
+
+    let hypotheses = engine.generate_hypotheses("What is the capital of France?");
+    assert_eq!(hypotheses, vec!["Paris is the capital of France"]);
+
+    let hypotheses = engine.generate_hypotheses("What is the capital of Germany?");
+    assert_eq!(hypotheses, vec![]);
 }
