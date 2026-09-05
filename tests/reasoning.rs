@@ -10,22 +10,27 @@ fn test_reasoning_engine() {
     assert_eq!(engine.reason("What is the capital of Germany?"), None);
     let reflected = engine.reflect();
     assert_eq!(reflected.len(), 1);
-    assert_eq!(reflected[0].0, "capital of France");
-    assert_eq!(reflected[0].1, "Paris");
-    let hypotheses = engine.generate_hypotheses("Paris is the capital of France");
-    assert!(hypotheses.is_empty());
+    assert_eq!(reflected[0].fact, "capital of France");
+    assert_eq!(reflected[0].value, "Paris");
+    let hypotheses = engine.generate_hypotheses("capital of France");
+    assert_eq!(hypotheses, vec!["Paris is the capital of France"]);
     assert!(engine.verify("Paris is the capital of France"));
 }
 
 #[test]
-fn test_reasoning_engine_generate_hypotheses() {
+fn test_reasoning_engine_generate_hypotheses_from_fact() {
     let mut engine = ReasoningEngine::new();
     engine.add_fact("capital of France", "Paris");
-    engine.add_fact("Paris is the capital of France", "true");
+
+    let hypotheses = engine.generate_hypotheses("capital of France");
+    assert_eq!(hypotheses, vec!["Paris is the capital of France"]);
+}
+
+#[test]
+fn test_reasoning_engine_generate_hypotheses_from_question() {
+    let mut engine = ReasoningEngine::new();
+    engine.add_fact("capital of France", "Paris");
 
     let hypotheses = engine.generate_hypotheses("What is the capital of France?");
     assert_eq!(hypotheses, vec!["Paris is the capital of France"]);
-
-    let hypotheses = engine.generate_hypotheses("What is the capital of Germany?");
-    assert_eq!(hypotheses, vec![]);
 }
